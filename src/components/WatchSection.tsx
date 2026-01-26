@@ -1,33 +1,21 @@
 import { Play } from "lucide-react";
+import { useLandingPage } from "@/context/LandingPageContext";
+import { Database } from "@/integrations/supabase/types";
 
-const videos = [
-  {
-    id: 1,
-    title: "Dating in Your 30s",
-    duration: "5:32",
-    views: "2.1M views",
-  },
-  {
-    id: 2,
-    title: "Family Thanksgiving",
-    duration: "7:15",
-    views: "1.8M views",
-  },
-  {
-    id: 3,
-    title: "The Gym Experience",
-    duration: "4:48",
-    views: "3.2M views",
-  },
-  {
-    id: 4,
-    title: "Online Shopping Addiction",
-    duration: "6:21",
-    views: "1.5M views",
-  },
-];
+type Video = Database['public']['Tables']['videos']['Row'];
 
 const WatchSection = () => {
+  const { videos } = useLandingPage();
+
+  const featuredVideo = videos.find(v => v.is_featured) || videos[0];
+  const gridVideos = videos.filter(v => v.id !== featuredVideo?.id);
+
+  const getThumbnail = (video: Video) => {
+      if (video.thumbnail_url) return video.thumbnail_url;
+      if (video.youtube_embed_id) return `https://img.youtube.com/vi/${video.youtube_embed_id}/maxresdefault.jpg`;
+      return null;
+  };
+
   return (
     <section id="watch" className="py-24 md:py-32 bg-primary text-primary-foreground">
       <div className="container mx-auto px-6">
@@ -42,50 +30,81 @@ const WatchSection = () => {
         </div>
 
         {/* Featured Video */}
+        {featuredVideo && (
         <div className="mb-12">
-          <div className="relative aspect-video bg-foreground/10 rounded-xl overflow-hidden group cursor-pointer">
-            <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-primary-foreground/20">
-              <span className="font-body text-sm uppercase tracking-widest text-primary-foreground/50">
-                Featured Video
-              </span>
-            </div>
+          <a 
+            href={featuredVideo.youtube_url || '#'} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block relative aspect-video bg-foreground/10 rounded-xl overflow-hidden group cursor-pointer"
+          >
+            {getThumbnail(featuredVideo) ? (
+                 <img 
+                    src={getThumbnail(featuredVideo)!} 
+                    alt={featuredVideo.title} 
+                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                 />
+            ) : (
+                <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-primary-foreground/20">
+                <span className="font-body text-sm uppercase tracking-widest text-primary-foreground/50">
+                    Featured Video
+                </span>
+                </div>
+            )}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-accent flex items-center justify-center group-hover:scale-110 transition-transform shadow-gold">
                 <Play className="w-8 h-8 md:w-10 md:h-10 text-accent-foreground ml-1" />
               </div>
             </div>
-          </div>
+          </a>
+          <h3 className="font-display text-2xl font-bold mt-4 text-center">{featuredVideo.title}</h3>
         </div>
+        )}
 
         {/* Video Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {videos.map((video) => (
-            <div
+          {gridVideos.map((video) => (
+            <a
               key={video.id}
+              href={video.youtube_url || '#'}
+              target="_blank" 
+              rel="noopener noreferrer"
               className="group cursor-pointer"
             >
               <div className="relative aspect-video bg-foreground/10 rounded-lg overflow-hidden mb-4">
-                <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-primary-foreground/20">
-                  <span className="font-body text-xs uppercase tracking-widest text-primary-foreground/30">
-                    Thumbnail
-                  </span>
-                </div>
+                {getThumbnail(video) ? (
+                     <img 
+                        src={getThumbnail(video)!} 
+                        alt={video.title} 
+                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                     />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-primary-foreground/20">
+                    <span className="font-body text-xs uppercase tracking-widest text-primary-foreground/30">
+                        Thumbnail
+                    </span>
+                    </div>
+                )}
                 <div className="absolute inset-0 bg-foreground/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center">
                     <Play className="w-5 h-5 text-accent-foreground ml-0.5" />
                   </div>
                 </div>
-                <div className="absolute bottom-2 right-2 px-2 py-1 bg-foreground/80 text-background text-xs rounded font-body">
-                  {video.duration}
-                </div>
+                {video.duration && (
+                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-foreground/80 text-background text-xs rounded font-body">
+                    {video.duration}
+                    </div>
+                )}
               </div>
               <h3 className="font-display text-lg font-semibold group-hover:text-accent transition-colors">
                 {video.title}
               </h3>
-              <p className="font-body text-sm text-primary-foreground/60">
-                {video.views}
-              </p>
-            </div>
+              {video.views && (
+                  <p className="font-body text-sm text-primary-foreground/60">
+                    {video.views}
+                  </p>
+              )}
+            </a>
           ))}
         </div>
       </div>

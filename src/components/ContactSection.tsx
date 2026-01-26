@@ -1,23 +1,14 @@
-import { useState, useEffect } from "react";
-import { Mail, Instagram, Twitter, Youtube } from "lucide-react";
+import { useState } from "react";
+import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-interface ContactSettings {
-  title: string;
-  subtitle: string;
-  description: string;
-  management_email: string;
-  instagram_url: string | null;
-  twitter_url: string | null;
-  youtube_url: string | null;
-}
+import { useLandingPage } from "@/context/LandingPageContext";
 
 const ContactSection = () => {
-  const [settings, setSettings] = useState<ContactSettings | null>(null);
+  const { contactSettings } = useLandingPage();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,28 +18,33 @@ const ContactSection = () => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      const { data } = await supabase
-        .from('contact_settings')
-        .select('*')
-        .maybeSingle();
-      
-      if (data) setSettings(data);
-    };
-    fetchSettings();
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
 
     try {
-      const { error } = await supabase.functions.invoke('send-contact-email', {
+      // 1. Save to database
+      const { error: dbError } = await supabase.from('contact_submissions').insert([
+        { 
+            name: formData.name, 
+            email: formData.email, 
+            subject: formData.subject, 
+            message: formData.message 
+        }
+      ]);
+
+      if (dbError) throw dbError;
+
+      // 2. Send email via Edge Function
+      const { error: funcError } = await supabase.functions.invoke('send-contact-email', {
         body: formData
       });
 
-      if (error) throw error;
+      if (funcError) {
+          console.error("Failed to send email:", funcError);
+          // We don't throw here because DB save was successful, 
+          // so the admin can still see it in CMS.
+      }
 
       toast({
         title: 'Message Sent!',
@@ -74,13 +70,13 @@ const ContactSection = () => {
           {/* Left side - Info */}
           <div>
             <p className="font-body text-sm uppercase tracking-[0.3em] text-accent mb-4">
-              {settings?.subtitle || 'Get in Touch'}
+              {contactSettings?.subtitle || 'Get in Touch'}
             </p>
             <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-8">
-              {settings?.title || 'Contact'}
+              {contactSettings?.title || 'Contact'}
             </h2>
             <p className="font-body text-primary-foreground/80 leading-relaxed mb-12">
-              {settings?.description || 'For booking inquiries, press requests, or just to say hi — reach out through the form or connect on social media.'}
+              {contactSettings?.description || 'For booking inquiries, press requests, or just to say hi — reach out through the form or connect on social media.'}
             </p>
 
             {/* Contact Info */}
@@ -94,137 +90,71 @@ const ContactSection = () => {
                     Management
                   </p>
                   <p className="font-body text-primary-foreground">
-                    {settings?.management_email || 'booking@catherinegeller.com'}
+                    {contactSettings?.management_email || 'booking@catherinegeller.com'}
                   </p>
                 </div>
-              </div>
-            </div>
-
-            {/* Social Links */}
-            <div>
-              <p className="font-body text-sm uppercase tracking-widest text-primary-foreground/60 mb-4">
-                Follow Along
-              </p>
-              <div className="flex gap-4">
-                {settings?.instagram_url && (
-                  <a
-                    href={settings.instagram_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-12 h-12 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all"
-                  >
-                    <Instagram className="w-5 h-5" />
-                  </a>
-                )}
-                {settings?.twitter_url && (
-                  <a
-                    href={settings.twitter_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-12 h-12 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all"
-                  >
-                    <Twitter className="w-5 h-5" />
-                  </a>
-                )}
-                {settings?.youtube_url && (
-                  <a
-                    href={settings.youtube_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-12 h-12 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all"
-                  >
-                    <Youtube className="w-5 h-5" />
-                  </a>
-                )}
-                {!settings?.instagram_url && !settings?.twitter_url && !settings?.youtube_url && (
-                  <>
-                    <a
-                      href="#"
-                      className="w-12 h-12 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all"
-                    >
-                      <Instagram className="w-5 h-5" />
-                    </a>
-                    <a
-                      href="#"
-                      className="w-12 h-12 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all"
-                    >
-                      <Twitter className="w-5 h-5" />
-                    </a>
-                    <a
-                      href="#"
-                      className="w-12 h-12 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all"
-                    >
-                      <Youtube className="w-5 h-5" />
-                    </a>
-                  </>
-                )}
               </div>
             </div>
           </div>
 
           {/* Right side - Form */}
-          <div className="bg-primary-foreground/5 rounded-2xl p-8 md:p-12 backdrop-blur-sm">
+          <div className="bg-background rounded-2xl p-8 md:p-12 shadow-elevated">
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div>
-                  <label className="font-body text-sm uppercase tracking-widest text-primary-foreground/60 mb-2 block">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="font-body text-sm font-medium text-foreground">
                     Name
                   </label>
                   <Input
-                    type="text"
-                    placeholder="Your name"
+                    id="name"
+                    required
+                    className="text-foreground border-border bg-input"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 focus:border-accent"
                   />
                 </div>
-                <div>
-                  <label className="font-body text-sm uppercase tracking-widest text-primary-foreground/60 mb-2 block">
+                <div className="space-y-2">
+                  <label htmlFor="email" className="font-body text-sm font-medium text-foreground">
                     Email
                   </label>
                   <Input
+                    id="email"
                     type="email"
-                    placeholder="your@email.com"
+                    required
+                    className="text-foreground border-border bg-input"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
-                    className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 focus:border-accent"
                   />
                 </div>
               </div>
-
-              <div>
-                <label className="font-body text-sm uppercase tracking-widest text-primary-foreground/60 mb-2 block">
+              <div className="space-y-2">
+                <label htmlFor="subject" className="font-body text-sm font-medium text-foreground">
                   Subject
                 </label>
                 <Input
-                  type="text"
-                  placeholder="What's this about?"
+                  id="subject"
+                  className="text-foreground border-border bg-input"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 focus:border-accent"
                 />
               </div>
-
-              <div>
-                <label className="font-body text-sm uppercase tracking-widest text-primary-foreground/60 mb-2 block">
+              <div className="space-y-2">
+                <label htmlFor="message" className="font-body text-sm font-medium text-foreground">
                   Message
                 </label>
                 <Textarea
-                  placeholder="Your message..."
-                  rows={5}
+                  id="message"
+                  required
+                  rows={6}
+                  className="text-foreground border-border bg-input resize-none"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  required
-                  className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 focus:border-accent resize-none"
                 />
               </div>
-
-              <Button
-                type="submit"
+              <Button 
+                type="submit" 
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 disabled={submitting}
-                className="w-full font-body uppercase tracking-widest bg-accent text-accent-foreground hover:bg-accent/90 py-6"
               >
                 {submitting ? 'Sending...' : 'Send Message'}
               </Button>

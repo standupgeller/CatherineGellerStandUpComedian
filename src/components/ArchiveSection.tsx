@@ -1,51 +1,9 @@
 import { Link } from "react-router-dom";
-
-const eras = [
-  {
-    id: "era-2024",
-    title: "Unfiltered Era",
-    year: "2024",
-    description: "Netflix Special & National Tour",
-    slug: "unfiltered-2024",
-  },
-  {
-    id: "era-2023",
-    title: "Podcast Era",
-    year: "2023",
-    description: "The Laugh Track Launch",
-    slug: "podcast-2023",
-  },
-  {
-    id: "era-2022",
-    title: "Rising Star Era",
-    year: "2022",
-    description: "Comedy Central Debut",
-    slug: "rising-star-2022",
-  },
-  {
-    id: "era-2021",
-    title: "Club Days Era",
-    year: "2021",
-    description: "Building the Foundation",
-    slug: "club-days-2021",
-  },
-  {
-    id: "era-2020",
-    title: "Virtual Era",
-    year: "2020",
-    description: "Live from the Living Room",
-    slug: "virtual-2020",
-  },
-  {
-    id: "era-2019",
-    title: "The Beginning",
-    year: "2019",
-    description: "First Open Mic",
-    slug: "beginning-2019",
-  },
-];
+import { useLandingPage } from "@/context/LandingPageContext";
 
 const ArchiveSection = () => {
+  const { archiveCategories } = useLandingPage();
+
   return (
     <section id="archive" className="py-24 md:py-32 bg-muted/30">
       <div className="container mx-auto px-6">
@@ -64,7 +22,8 @@ const ArchiveSection = () => {
 
         {/* Eras Grid - Taylor Swift inspired */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {eras.map((era) => (
+          {archiveCategories.length > 0 ? (
+            archiveCategories.map((era) => (
             <Link
               key={era.id}
               to={`/archive/${era.slug}`}
@@ -72,11 +31,19 @@ const ArchiveSection = () => {
             >
               {/* Background placeholder */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/10 to-rose/20">
-                <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border">
-                  <span className="font-body text-xs uppercase tracking-widest text-muted-foreground">
-                    Era Image
-                  </span>
-                </div>
+                {era.cover_image_url ? (
+                    <img 
+                        src={era.cover_image_url} 
+                        alt={era.title} 
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border">
+                        <span className="font-body text-xs uppercase tracking-widest text-muted-foreground">
+                            Era Image
+                        </span>
+                    </div>
+                )}
               </div>
 
               {/* Overlay */}
@@ -84,9 +51,11 @@ const ArchiveSection = () => {
 
               {/* Content */}
               <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end">
+                {/* 
                 <span className="font-body text-xs uppercase tracking-[0.3em] text-accent mb-2">
-                  {era.year}
+                  {era.year} 
                 </span>
+                */}
                 <h3 className="font-display text-2xl md:text-3xl font-bold text-background mb-2 group-hover:text-accent transition-colors">
                   {era.title}
                 </h3>
@@ -99,23 +68,13 @@ const ArchiveSection = () => {
                   <span className="font-body text-xs uppercase tracking-widest">
                     Explore
                   </span>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
                 </div>
               </div>
             </Link>
-          ))}
+          ))
+          ) : (
+              <div className="text-center text-muted-foreground col-span-full">No archives found.</div>
+          )}
         </div>
       </div>
     </section>

@@ -1,26 +1,24 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const navLinks = [
-  { name: "About", href: "#about" },
-  { name: "Projects", href: "#projects" },
-  { name: "Watch", href: "#watch" },
-  { name: "Tour", href: "#tour" },
-  { name: "Archive", href: "#archive" },
-  { name: "Contact", href: "#contact" },
-];
+import { useLandingPage } from "@/context/LandingPageContext";
 
 const Navbar = () => {
+  const { navLinks, siteSettings } = useLandingPage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const siteName = siteSettings?.site_name || "CATHERINE GELLER";
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+        window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const scrollToSection = (href: string) => {
@@ -30,6 +28,18 @@ const Navbar = () => {
     }
     setIsMobileMenuOpen(false);
   };
+  
+  // Fallback links if DB is empty
+  const defaultLinks = [
+      { name: "About", href: "#about", id: '1' },
+      { name: "Projects", href: "#projects", id: '2' },
+      { name: "Watch", href: "#watch", id: '3' },
+      { name: "Tour", href: "#tour", id: '4' },
+      { name: "Archive", href: "#archive", id: '5' },
+      { name: "Contact", href: "#contact", id: '6' },
+  ];
+  
+  const displayLinks = navLinks.length > 0 ? navLinks : defaultLinks;
 
   return (
     <nav
@@ -47,14 +57,14 @@ const Navbar = () => {
             isScrolled ? "text-primary hover:text-accent" : "text-champagne hover:text-accent"
           }`}
         >
-          CATHERINE GELLER
+          {siteName}
         </button>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
+          {displayLinks.map((link) => (
             <button
-              key={link.name}
+              key={link.id}
               onClick={() => scrollToSection(link.href)}
               className={`font-body text-sm uppercase tracking-widest nav-link-underline transition-colors ${
                 isScrolled ? "text-foreground/80 hover:text-accent" : "text-champagne/90 hover:text-accent"
@@ -84,9 +94,9 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-background/98 backdrop-blur-lg border-b border-border animate-fade-in">
           <div className="container mx-auto px-6 py-8 flex flex-col gap-6">
-            {navLinks.map((link, index) => (
+            {displayLinks.map((link, index) => (
               <button
-                key={link.name}
+                key={link.id}
                 onClick={() => scrollToSection(link.href)}
                 className="font-body text-lg uppercase tracking-widest text-foreground/80 hover:text-accent transition-colors text-left"
                 style={{ animationDelay: `${index * 0.1}s` }}
