@@ -17,3 +17,6 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     flowType: 'pkce', // Use PKCE for better security and reliability across environments
   }
 });
+if (typeof window !== "undefined") {
+  console.log("Supabase URL:", SUPABASE_URL);
+}
