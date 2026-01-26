@@ -34,44 +34,25 @@ export const useAuth = () => {
     );
 
     // Get initial session
-    const initSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          console.log('Checking admin role for user:', session.user.id);
-          
-          // Use RPC call to bypass potential RLS recursion or permission issues on the table
-          const { data, error } = await supabase.rpc('has_role', { 
-            _user_id: session.user.id, 
-            _role: 'admin' 
-          });
-            
-          if (error) {
-            console.error('Error checking admin role via RPC:', error);
-            // Fallback to table select if RPC fails (e.g. function not found)
-            const { data: tableData } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', session.user.id)
-              .eq('role', 'admin')
-              .maybeSingle();
-            setIsAdmin(!!tableData);
-          } else {
-            console.log('Admin role check result:', data);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .eq('role', 'admin')
+          .maybeSingle()
+          .then(({ data }) => {
             setIsAdmin(!!data);
-          }
-        }
-      } catch (err) {
-        console.error('Error checking auth session:', err);
-      } finally {
+            setLoading(false);
+          });
+      } else {
         setLoading(false);
       }
-    };
-
-    initSession();
+    });
 
     return () => subscription.unsubscribe();
   }, []);
