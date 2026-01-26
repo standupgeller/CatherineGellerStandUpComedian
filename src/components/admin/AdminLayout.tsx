@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
@@ -49,8 +49,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   if (!user || !isAdmin) {
-    navigate('/admin/login');
-    return null;
+    return <Navigate to="/admin/login" replace state={{ from: location }} />;
   }
 
   const handleSignOut = async () => {

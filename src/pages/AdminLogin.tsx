@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,11 +15,11 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Redirect if already logged in as admin
-  if (!loading && isAdmin) {
-    navigate('/admin');
-    return null;
-  }
+  useEffect(() => {
+    if (!loading && isAdmin) {
+      navigate('/admin', { replace: true });
+    }
+  }, [loading, isAdmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,12 +36,8 @@ const AdminLogin = () => {
     } else {
       toast({
         title: 'Login Successful',
-        description: 'Checking admin permissions...'
+        description: 'Redirecting...'
       });
-      // The auth state listener will handle the redirect
-      setTimeout(() => {
-        navigate('/admin');
-      }, 500);
     }
 
     setIsLoading(false);
