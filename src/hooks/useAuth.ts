@@ -42,20 +42,27 @@ export const useAuth = () => {
         
         if (session?.user) {
           console.log('Checking admin role for user:', session.user.id);
-          const { data, error } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', session.user.id)
-            .eq('role', 'admin')
-            .maybeSingle();
+          
+          // Use RPC call to bypass potential RLS recursion or permission issues on the table
+          const { data, error } = await supabase.rpc('has_role', { 
+            _user_id: session.user.id, 
+            _role: 'admin' 
+          });
             
           if (error) {
-            console.error('Error fetching user role:', error);
+            console.error('Error checking admin role via RPC:', error);
+            // Fallback to table select if RPC fails (e.g. function not found)
+            const { data: tableData } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', session.user.id)
+              .eq('role', 'admin')
+              .maybeSingle();
+            setIsAdmin(!!tableData);
           } else {
-            console.log('User role data:', data);
+            console.log('Admin role check result:', data);
+            setIsAdmin(!!data);
           }
-          
-          setIsAdmin(!!data);
         }
       } catch (err) {
         console.error('Error checking auth session:', err);
