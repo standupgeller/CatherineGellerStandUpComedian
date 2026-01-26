@@ -11,15 +11,25 @@ const AdminLogin = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, isAdmin, loading } = useAuth();
+  const { signIn, isAdmin, loading, user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!loading && isAdmin) {
-      navigate('/admin', { replace: true });
+    if (!loading) {
+      if (isAdmin) {
+        navigate('/admin', { replace: true });
+      } else if (user) {
+        // User is logged in but NOT admin
+        toast({
+          title: 'Access Denied',
+          description: 'You do not have administrator privileges.',
+          variant: 'destructive'
+        });
+        signOut();
+      }
     }
-  }, [loading, isAdmin, navigate]);
+  }, [loading, isAdmin, user, navigate, signOut, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
