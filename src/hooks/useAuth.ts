@@ -34,25 +34,34 @@ export const useAuth = () => {
     );
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .eq('role', 'admin')
-          .maybeSingle()
-          .then(({ data }) => {
-            setIsAdmin(!!data);
-            setLoading(false);
-          });
-      } else {
+    const initSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          const { data, error } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .eq('role', 'admin')
+            .maybeSingle();
+            
+          if (error) {
+            console.error('Error fetching user role:', error);
+          }
+          
+          setIsAdmin(!!data);
+        }
+      } catch (err) {
+        console.error('Error checking auth session:', err);
+      } finally {
         setLoading(false);
       }
-    });
+    };
+
+    initSession();
 
     return () => subscription.unsubscribe();
   }, []);

@@ -25,22 +25,31 @@ const AdminLogin = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const { error } = await signIn(email, password);
+    try {
+      const { error } = await signIn(email, password);
 
-    if (error) {
+      if (error) {
+        toast({
+          title: 'Login Failed',
+          description: error.message,
+          variant: 'destructive'
+        });
+      } else {
+        toast({
+          title: 'Login Successful',
+          description: 'Redirecting...'
+        });
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
       toast({
-        title: 'Login Failed',
-        description: error.message,
+        title: 'An unexpected error occurred',
+        description: error.message || 'Please try again later',
         variant: 'destructive'
       });
-    } else {
-      toast({
-        title: 'Login Successful',
-        description: 'Redirecting...'
-      });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
