@@ -25,7 +25,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        {import.meta.env.VITE_USE_HASH_ROUTER === "true" ? (
+        {import.meta.env.PROD || import.meta.env.VITE_USE_HASH_ROUTER === "true" ? (
           <HashRouter>
             <Routes>
               <Route path="/" element={<Index />} />
