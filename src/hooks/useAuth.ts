@@ -41,6 +41,7 @@ export const useAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log('Checking admin role for user:', session.user.id);
           const { data, error } = await supabase
             .from('user_roles')
             .select('role')
@@ -50,6 +51,8 @@ export const useAuth = () => {
             
           if (error) {
             console.error('Error fetching user role:', error);
+          } else {
+            console.log('User role data:', data);
           }
           
           setIsAdmin(!!data);

@@ -21,15 +21,11 @@ const AdminLogin = () => {
         navigate('/admin', { replace: true });
       } else if (user) {
         // User is logged in but NOT admin
-        toast({
-          title: 'Access Denied',
-          description: 'You do not have administrator privileges.',
-          variant: 'destructive'
-        });
-        signOut();
+        // We do not auto-signout anymore to allow debugging
+        // Just show the error state in the UI
       }
     }
-  }, [loading, isAdmin, user, navigate, signOut, toast]);
+  }, [loading, isAdmin, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,6 +68,13 @@ const AdminLogin = () => {
             </div>
             <h1 className="font-display text-2xl font-bold text-foreground">Admin Access</h1>
             <p className="font-body text-muted-foreground mt-2">Sign in to manage your site</p>
+            {user && !isAdmin && !loading && (
+              <div className="mt-4 p-3 bg-destructive/10 text-destructive rounded-md text-sm">
+                Signed in as {user.email} but unauthorized.<br/>
+                Please check your admin role.
+                <Button variant="link" onClick={() => signOut()} className="p-0 h-auto ml-1 text-destructive font-bold">Sign Out</Button>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
