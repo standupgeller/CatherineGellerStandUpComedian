@@ -29,15 +29,16 @@ const AdminLogin = () => {
     if (!user) return;
     setGranting(true);
     try {
-      const { error } = await (supabase as any).rpc('grant_admin', { _user_id: user.id });
+      const { error } = await supabase.rpc('grant_admin', { _user_id: user.id });
       if (error) {
         toast({ title: 'Grant failed', description: error.message, variant: 'destructive' });
       } else {
         toast({ title: 'Admin role granted', description: 'Reloading...' });
         window.location.reload();
       }
-    } catch (e: any) {
-      toast({ title: 'Grant failed', description: e?.message || 'Unknown error', variant: 'destructive' });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      toast({ title: 'Grant failed', description: message, variant: 'destructive' });
     } finally {
       setGranting(false);
     }

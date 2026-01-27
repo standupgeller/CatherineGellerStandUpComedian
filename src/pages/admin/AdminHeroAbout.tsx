@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
+import type { Json } from '@/integrations/supabase/types';
 
 interface SiteSettings {
   id: string;
@@ -90,7 +91,7 @@ const AdminHeroAbout = () => {
       // Cast stats back to Json for Supabase
       const updateData = {
           ...aboutSection,
-          stats: aboutSection.stats as unknown as any // Supabase expects Json
+          stats: aboutSection.stats as unknown as Json // Supabase expects Json
       };
 
       const { error } = await supabase

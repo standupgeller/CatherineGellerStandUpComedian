@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, Edit, FolderOpen } from 'lucide-react';
@@ -18,18 +17,8 @@ interface ArchiveCategory {
   slug: string;
   description: string | null;
   cover_image_url: string | null;
-  is_visible: boolean;
-  sort_order: number;
-}
-
-interface ArchiveItem {
-  id: string;
-  category_id: string | null;
-  title: string;
-  description: string | null;
-  image_url: string | null;
   link_url: string | null;
-  date: string | null;
+  year: string | null;
   is_visible: boolean;
   sort_order: number;
 }
@@ -39,31 +28,18 @@ const emptyCategory: Omit<ArchiveCategory, 'id'> = {
   slug: '',
   description: '',
   cover_image_url: '',
-  is_visible: true,
-  sort_order: 0
-};
-
-const emptyItem: Omit<ArchiveItem, 'id'> = {
-  category_id: null,
-  title: '',
-  description: '',
-  image_url: '',
   link_url: '',
-  date: '',
+  year: '',
   is_visible: true,
   sort_order: 0
 };
 
 const AdminArchive = () => {
   const [categories, setCategories] = useState<ArchiveCategory[]>([]);
-  const [items, setItems] = useState<ArchiveItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingCategory, setEditingCategory] = useState<ArchiveCategory | null>(null);
-  const [editingItem, setEditingItem] = useState<ArchiveItem | null>(null);
   const [newCategory, setNewCategory] = useState(emptyCategory);
-  const [newItem, setNewItem] = useState(emptyItem);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
-  const [itemDialogOpen, setItemDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -71,16 +47,11 @@ const AdminArchive = () => {
   }, []);
 
   const fetchData = async () => {
-    const [categoriesRes, itemsRes] = await Promise.all([
-      supabase.from('archive_categories').select('*').order('sort_order'),
-      supabase.from('archive_items').select('*').order('sort_order')
-    ]);
-
-    if (categoriesRes.error || itemsRes.error) {
+    const { data, error } = await supabase.from('archive_categories').select('*').order('sort_order');
+    if (error) {
       toast({ title: 'Error loading archive data', variant: 'destructive' });
     } else {
-      setCategories(categoriesRes.data || []);
-      setItems(itemsRes.data || []);
+      setCategories(data || []);
     }
     setLoading(false);
   };
@@ -136,56 +107,10 @@ const AdminArchive = () => {
       toast({ title: 'Error deleting category', variant: 'destructive' });
     } else {
       setCategories(categories.filter(c => c.id !== id));
-      setItems(items.filter(i => i.category_id !== id));
       toast({ title: 'Category deleted' });
     }
   };
 
-  // Item CRUD
-  const handleCreateItem = async () => {
-    const { data, error } = await supabase
-      .from('archive_items')
-      .insert(newItem)
-      .select()
-      .single();
-
-    if (error) {
-      toast({ title: 'Error creating item', variant: 'destructive' });
-    } else if (data) {
-      setItems([...items, data]);
-      setNewItem(emptyItem);
-      setItemDialogOpen(false);
-      toast({ title: 'Item created' });
-    }
-  };
-
-  const handleUpdateItem = async () => {
-    if (!editingItem) return;
-
-    const { error } = await supabase
-      .from('archive_items')
-      .update(editingItem)
-      .eq('id', editingItem.id);
-
-    if (error) {
-      toast({ title: 'Error updating item', variant: 'destructive' });
-    } else {
-      setItems(items.map(i => i.id === editingItem.id ? editingItem : i));
-      setEditingItem(null);
-      toast({ title: 'Item updated' });
-    }
-  };
-
-  const handleDeleteItem = async (id: string) => {
-    const { error } = await supabase.from('archive_items').delete().eq('id', id);
-
-    if (error) {
-      toast({ title: 'Error deleting item', variant: 'destructive' });
-    } else {
-      setItems(items.filter(i => i.id !== id));
-      toast({ title: 'Item deleted' });
-    }
-  };
 
   if (loading) {
     return (
@@ -208,7 +133,6 @@ const AdminArchive = () => {
         <Tabs defaultValue="categories">
           <TabsList>
             <TabsTrigger value="categories">Categories</TabsTrigger>
-            <TabsTrigger value="items">Items</TabsTrigger>
           </TabsList>
 
           <TabsContent value="categories" className="space-y-4 mt-6">
@@ -226,7 +150,7 @@ const AdminArchive = () => {
                   </DialogHeader>
                   <CategoryForm
                     category={newCategory}
-                    setCategory={setNewCategory}
+                    setCategory={(c) => setNewCategory(c as Omit<ArchiveCategory, 'id'>)}
                     onSave={handleCreateCategory}
                     isNew
                   />
@@ -251,7 +175,7 @@ const AdminArchive = () => {
                         </div>
                         <p className="text-sm text-muted-foreground">/{category.slug}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {items.filter(i => i.category_id === category.id).length} items
+                          {category.link_url ? 'Has link' : 'No link set'}
                         </p>
                       </div>
                     </div>
@@ -270,7 +194,7 @@ const AdminArchive = () => {
                           {editingCategory && (
                             <CategoryForm
                               category={editingCategory}
-                              setCategory={setEditingCategory}
+                              setCategory={(c) => setEditingCategory(c as ArchiveCategory)}
                               onSave={handleUpdateCategory}
                             />
                           )}
@@ -297,98 +221,7 @@ const AdminArchive = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="items" className="space-y-4 mt-6">
-            <div className="flex justify-end">
-              <Dialog open={itemDialogOpen} onOpenChange={setItemDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button disabled={categories.length === 0}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Item
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>New Item</DialogTitle>
-                  </DialogHeader>
-                  <ItemForm
-                    item={newItem}
-                    setItem={setNewItem}
-                    onSave={handleCreateItem}
-                    categories={categories}
-                    isNew
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
-
-            <div className="space-y-4">
-              {categories.map((category) => {
-                const categoryItems = items.filter(i => i.category_id === category.id);
-                if (categoryItems.length === 0) return null;
-
-                return (
-                  <Card key={category.id}>
-                    <CardHeader>
-                      <CardTitle className="text-lg">{category.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {categoryItems.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">{item.title}</span>
-                              {!item.is_visible && (
-                                <span className="text-xs bg-muted px-2 py-0.5 rounded">Hidden</span>
-                              )}
-                            </div>
-                            {item.date && (
-                              <span className="text-xs text-muted-foreground">{item.date}</span>
-                            )}
-                          </div>
-                          <div className="flex gap-2">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="ghost" size="icon" onClick={() => setEditingItem(item)}>
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-2xl">
-                                <DialogHeader>
-                                  <DialogTitle>Edit Item</DialogTitle>
-                                </DialogHeader>
-                                {editingItem && (
-                                  <ItemForm
-                                    item={editingItem}
-                                    setItem={setEditingItem}
-                                    onSave={handleUpdateItem}
-                                    categories={categories}
-                                  />
-                                )}
-                              </DialogContent>
-                            </Dialog>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteItem(item.id)}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                );
-              })}
-
-              {items.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground">
-                  No items yet. {categories.length === 0 ? 'Create a category first.' : 'Click "Add Item" to create one.'}
-                </div>
-              )}
-            </div>
-          </TabsContent>
+          
         </Tabs>
       </div>
     </AdminLayout>
@@ -397,7 +230,7 @@ const AdminArchive = () => {
 
 const CategoryForm = ({ category, setCategory, onSave, isNew }: {
   category: ArchiveCategory | Omit<ArchiveCategory, 'id'>;
-  setCategory: (c: any) => void;
+  setCategory: (c: ArchiveCategory | Omit<ArchiveCategory, 'id'>) => void;
   onSave: () => void;
   isNew?: boolean;
 }) => (
@@ -436,6 +269,22 @@ const CategoryForm = ({ category, setCategory, onSave, isNew }: {
         />
       </div>
       <div>
+        <label className="text-sm font-medium mb-2 block">Link URL</label>
+        <Input
+          value={category.link_url || ''}
+          onChange={(e) => setCategory({ ...category, link_url: e.target.value })}
+          placeholder="https://example.com"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Year</label>
+        <Input
+          value={category.year || ''}
+          onChange={(e) => setCategory({ ...category, year: e.target.value })}
+          placeholder="e.g. 2024"
+        />
+      </div>
+      <div>
         <label className="text-sm font-medium mb-2 block">Sort Order</label>
         <Input
           type="number"
@@ -453,92 +302,6 @@ const CategoryForm = ({ category, setCategory, onSave, isNew }: {
     </div>
     <Button onClick={onSave} className="w-full">
       {isNew ? 'Create Category' : 'Update Category'}
-    </Button>
-  </div>
-);
-
-const ItemForm = ({ item, setItem, onSave, categories, isNew }: {
-  item: ArchiveItem | Omit<ArchiveItem, 'id'>;
-  setItem: (i: any) => void;
-  onSave: () => void;
-  categories: ArchiveCategory[];
-  isNew?: boolean;
-}) => (
-  <div className="space-y-4">
-    <div>
-      <label className="text-sm font-medium mb-2 block">Category</label>
-      <Select
-        value={item.category_id || ''}
-        onValueChange={(value) => setItem({ ...item, category_id: value || null })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select category" />
-        </SelectTrigger>
-        <SelectContent>
-          {categories.map((cat) => (
-            <SelectItem key={cat.id} value={cat.id}>{cat.title}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-    <div>
-      <label className="text-sm font-medium mb-2 block">Title</label>
-      <Input
-        value={item.title}
-        onChange={(e) => setItem({ ...item, title: e.target.value })}
-      />
-    </div>
-    <div>
-      <label className="text-sm font-medium mb-2 block">Description</label>
-      <Textarea
-        value={item.description || ''}
-        onChange={(e) => setItem({ ...item, description: e.target.value })}
-        rows={3}
-      />
-    </div>
-    <div className="grid sm:grid-cols-2 gap-4">
-      <div>
-        <label className="text-sm font-medium mb-2 block">Image URL</label>
-        <Input
-          value={item.image_url || ''}
-          onChange={(e) => setItem({ ...item, image_url: e.target.value })}
-        />
-      </div>
-      <div>
-        <label className="text-sm font-medium mb-2 block">Link URL</label>
-        <Input
-          value={item.link_url || ''}
-          onChange={(e) => setItem({ ...item, link_url: e.target.value })}
-        />
-      </div>
-    </div>
-    <div className="grid sm:grid-cols-2 gap-4">
-      <div>
-        <label className="text-sm font-medium mb-2 block">Date</label>
-        <Input
-          value={item.date || ''}
-          onChange={(e) => setItem({ ...item, date: e.target.value })}
-          placeholder="2024"
-        />
-      </div>
-      <div>
-        <label className="text-sm font-medium mb-2 block">Sort Order</label>
-        <Input
-          type="number"
-          value={item.sort_order}
-          onChange={(e) => setItem({ ...item, sort_order: parseInt(e.target.value) })}
-        />
-      </div>
-    </div>
-    <div className="flex items-center gap-2">
-      <Switch
-        checked={item.is_visible}
-        onCheckedChange={(checked) => setItem({ ...item, is_visible: checked })}
-      />
-      <span className="text-sm">Visible</span>
-    </div>
-    <Button onClick={onSave} className="w-full">
-      {isNew ? 'Create Item' : 'Update Item'}
     </Button>
   </div>
 );

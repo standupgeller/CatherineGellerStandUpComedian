@@ -149,7 +149,7 @@ const AdminTour = () => {
               </DialogHeader>
               <TourDateForm
                 tourDate={newDate}
-                setTourDate={setNewDate}
+                setTourDate={(d) => setNewDate(d as Omit<TourDate, 'id'>)}
                 onSave={handleCreate}
                 isNew
               />
@@ -214,7 +214,7 @@ const AdminTour = () => {
                         {editingDate && (
                           <TourDateForm
                             tourDate={editingDate}
-                            setTourDate={setEditingDate}
+                            setTourDate={(d) => setEditingDate(d as TourDate)}
                             onSave={handleUpdate}
                           />
                         )}
@@ -247,7 +247,7 @@ const AdminTour = () => {
 
 const TourDateForm = ({ tourDate, setTourDate, onSave, isNew }: {
   tourDate: TourDate | Omit<TourDate, 'id'>;
-  setTourDate: (d: any) => void;
+  setTourDate: (d: TourDate | Omit<TourDate, 'id'>) => void;
   onSave: () => void;
   isNew?: boolean;
 }) => (

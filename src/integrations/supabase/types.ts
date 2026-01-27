@@ -49,26 +49,31 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           description: string | null
+          link_url: string | null
           id: string
           is_visible: boolean
           slug: string
           sort_order: number
           title: string
+          year: string | null
           updated_at: string
         }
         Insert: {
           cover_image_url?: string | null
           created_at?: string
+          link_url?: string | null
           description?: string | null
           id?: string
           is_visible?: boolean
           slug: string
           sort_order?: number
           title: string
+          year?: string | null
           updated_at?: string
         }
         Update: {
           cover_image_url?: string | null
+          link_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -76,6 +81,7 @@ export type Database = {
           slug?: string
           sort_order?: number
           title?: string
+          year?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -459,6 +465,12 @@ export type Database = {
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      grant_admin: {
+        Args: {
           _user_id: string
         }
         Returns: boolean

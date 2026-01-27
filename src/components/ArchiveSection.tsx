@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useLandingPage } from "@/context/LandingPageContext";
 
 const ArchiveSection = () => {
@@ -24,10 +23,12 @@ const ArchiveSection = () => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {archiveCategories.length > 0 ? (
             archiveCategories.map((era) => (
-            <Link
+            <a
               key={era.id}
-              to={`/archive/${era.slug}`}
-              className="group relative aspect-square overflow-hidden rounded-xl hover-lift cursor-pointer"
+              href={era.link_url || '#'}
+              target={era.link_url ? "_blank" : undefined}
+              rel={era.link_url ? "noopener noreferrer" : undefined}
+              className={`group relative aspect-square overflow-hidden rounded-xl hover-lift ${era.link_url ? 'cursor-pointer' : 'cursor-not-allowed'}`}
             >
               {/* Background placeholder */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/10 to-rose/20">
@@ -51,11 +52,11 @@ const ArchiveSection = () => {
 
               {/* Content */}
               <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end">
-                {/* 
-                <span className="font-body text-xs uppercase tracking-[0.3em] text-accent mb-2">
-                  {era.year} 
-                </span>
-                */}
+                {era.year && (
+                  <span className="font-body text-xs uppercase tracking-[0.3em] text-accent mb-2">
+                    {era.year}
+                  </span>
+                )}
                 <h3 className="font-display text-2xl md:text-3xl font-bold text-background mb-2 group-hover:text-accent transition-colors">
                   {era.title}
                 </h3>
@@ -70,7 +71,7 @@ const ArchiveSection = () => {
                   </span>
                 </div>
               </div>
-            </Link>
+            </a>
           ))
           ) : (
               <div className="text-center text-muted-foreground col-span-full">No archives found.</div>

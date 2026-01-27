@@ -137,7 +137,7 @@ const AdminProjects = () => {
               </DialogHeader>
               <ProjectForm
                 project={newProject}
-                setProject={setNewProject}
+                setProject={(p) => setNewProject(p as Omit<Project, 'id'>)}
                 onSave={handleCreate}
                 isNew
               />
@@ -181,7 +181,7 @@ const AdminProjects = () => {
                         {editingProject && (
                           <ProjectForm
                             project={editingProject}
-                            setProject={setEditingProject}
+                            setProject={(p) => setEditingProject(p as Project)}
                             onSave={handleUpdate}
                           />
                         )}
@@ -214,7 +214,7 @@ const AdminProjects = () => {
 
 const ProjectForm = ({ project, setProject, onSave, isNew }: {
   project: Project | Omit<Project, 'id'>;
-  setProject: (p: any) => void;
+  setProject: (p: Project | Omit<Project, 'id'>) => void;
   onSave: () => void;
   isNew?: boolean;
 }) => (

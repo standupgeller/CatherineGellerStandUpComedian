@@ -195,6 +195,7 @@ const AdminContact = () => {
                   <Input
                     type="email"
                     value={contactSettings?.management_email || ''}
+                    placeholder="gmail@example.com"
                     onChange={(e) => setContactSettings(prev => prev ? { ...prev, management_email: e.target.value } : null)}
                   />
                 </div>

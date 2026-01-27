@@ -37,7 +37,7 @@ const emptyVideo: Omit<Video, 'id'> = {
 };
 
 const extractYouTubeId = (url: string): string => {
-  const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+  const match = url.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/);
   return match ? match[1] : '';
 };
 
@@ -153,7 +153,7 @@ const AdminVideos = () => {
               </DialogHeader>
               <VideoForm
                 video={newVideo}
-                setVideo={setNewVideo}
+                setVideo={(v) => setNewVideo(v as Omit<Video, 'id'>)}
                 onSave={handleCreate}
                 isNew
               />
@@ -209,7 +209,7 @@ const AdminVideos = () => {
                       {editingVideo && (
                         <VideoForm
                           video={editingVideo}
-                          setVideo={setEditingVideo}
+                          setVideo={(v) => setEditingVideo(v as Video)}
                           onSave={handleUpdate}
                         />
                       )}
@@ -241,7 +241,7 @@ const AdminVideos = () => {
 
 const VideoForm = ({ video, setVideo, onSave, isNew }: {
   video: Video | Omit<Video, 'id'>;
-  setVideo: (v: any) => void;
+  setVideo: (v: Video | Omit<Video, 'id'>) => void;
   onSave: () => void;
   isNew?: boolean;
 }) => (

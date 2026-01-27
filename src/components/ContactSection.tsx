@@ -35,9 +35,9 @@ const ContactSection = () => {
 
       if (dbError) throw dbError;
 
-      // 2. Send email via Edge Function
-      const { error: funcError } = await supabase.functions.invoke('send-contact-email', {
-        body: formData
+      // 2. Send email via Edge Function (Gmail)
+      const { error: funcError } = await supabase.functions.invoke('gmail-notify', {
+        body: { ...formData, recipientEmail: contactSettings?.management_email || null }
       });
 
       if (funcError) {
@@ -52,10 +52,10 @@ const ContactSection = () => {
       });
 
       setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to send message. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to send message. Please try again.',
         variant: 'destructive'
       });
     }
@@ -110,6 +110,7 @@ const ContactSection = () => {
                     required
                     className="text-foreground border-border bg-input"
                     value={formData.name}
+                    placeholder="Your name"
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
@@ -123,6 +124,7 @@ const ContactSection = () => {
                     required
                     className="text-foreground border-border bg-input"
                     value={formData.email}
+                    placeholder="you@gmail.com"
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   />
                 </div>
@@ -135,6 +137,7 @@ const ContactSection = () => {
                   id="subject"
                   className="text-foreground border-border bg-input"
                   value={formData.subject}
+                    placeholder="Booking inquiry, press, or general question"
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 />
               </div>
@@ -148,6 +151,7 @@ const ContactSection = () => {
                   rows={6}
                   className="text-foreground border-border bg-input resize-none"
                   value={formData.message}
+                    placeholder="Tell us more about your request..."
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 />
               </div>
