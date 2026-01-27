@@ -187,153 +187,6 @@ const AdminArchive = () => {
     }
   };
 
-  const CategoryForm = ({ category, setCategory, onSave, isNew }: {
-    category: ArchiveCategory | Omit<ArchiveCategory, 'id'>;
-    setCategory: (c: any) => void;
-    onSave: () => void;
-    isNew?: boolean;
-  }) => (
-    <div className="space-y-4">
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Title</label>
-          <Input
-            value={category.title}
-            onChange={(e) => setCategory({ ...category, title: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Slug</label>
-          <Input
-            value={category.slug}
-            onChange={(e) => setCategory({ ...category, slug: e.target.value })}
-            placeholder="auto-generated-from-title"
-          />
-        </div>
-      </div>
-      <div>
-        <label className="text-sm font-medium mb-2 block">Description</label>
-        <Textarea
-          value={category.description || ''}
-          onChange={(e) => setCategory({ ...category, description: e.target.value })}
-          rows={3}
-        />
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Cover Image URL</label>
-          <Input
-            value={category.cover_image_url || ''}
-            onChange={(e) => setCategory({ ...category, cover_image_url: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Sort Order</label>
-          <Input
-            type="number"
-            value={category.sort_order}
-            onChange={(e) => setCategory({ ...category, sort_order: parseInt(e.target.value) })}
-          />
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <Switch
-          checked={category.is_visible}
-          onCheckedChange={(checked) => setCategory({ ...category, is_visible: checked })}
-        />
-        <span className="text-sm">Visible</span>
-      </div>
-      <Button onClick={onSave} className="w-full">
-        {isNew ? 'Create Category' : 'Update Category'}
-      </Button>
-    </div>
-  );
-
-  const ItemForm = ({ item, setItem, onSave, isNew }: {
-    item: ArchiveItem | Omit<ArchiveItem, 'id'>;
-    setItem: (i: any) => void;
-    onSave: () => void;
-    isNew?: boolean;
-  }) => (
-    <div className="space-y-4">
-      <div>
-        <label className="text-sm font-medium mb-2 block">Category</label>
-        <Select
-          value={item.category_id || ''}
-          onValueChange={(value) => setItem({ ...item, category_id: value || null })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select category" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((cat) => (
-              <SelectItem key={cat.id} value={cat.id}>{cat.title}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <label className="text-sm font-medium mb-2 block">Title</label>
-        <Input
-          value={item.title}
-          onChange={(e) => setItem({ ...item, title: e.target.value })}
-        />
-      </div>
-      <div>
-        <label className="text-sm font-medium mb-2 block">Description</label>
-        <Textarea
-          value={item.description || ''}
-          onChange={(e) => setItem({ ...item, description: e.target.value })}
-          rows={3}
-        />
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Image URL</label>
-          <Input
-            value={item.image_url || ''}
-            onChange={(e) => setItem({ ...item, image_url: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Link URL</label>
-          <Input
-            value={item.link_url || ''}
-            onChange={(e) => setItem({ ...item, link_url: e.target.value })}
-          />
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Date</label>
-          <Input
-            value={item.date || ''}
-            onChange={(e) => setItem({ ...item, date: e.target.value })}
-            placeholder="2024"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Sort Order</label>
-          <Input
-            type="number"
-            value={item.sort_order}
-            onChange={(e) => setItem({ ...item, sort_order: parseInt(e.target.value) })}
-          />
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <Switch
-          checked={item.is_visible}
-          onCheckedChange={(checked) => setItem({ ...item, is_visible: checked })}
-        />
-        <span className="text-sm">Visible</span>
-      </div>
-      <Button onClick={onSave} className="w-full">
-        {isNew ? 'Create Item' : 'Update Item'}
-      </Button>
-    </div>
-  );
-
   if (loading) {
     return (
       <AdminLayout>
@@ -461,6 +314,7 @@ const AdminArchive = () => {
                     item={newItem}
                     setItem={setNewItem}
                     onSave={handleCreateItem}
+                    categories={categories}
                     isNew
                   />
                 </DialogContent>
@@ -507,6 +361,7 @@ const AdminArchive = () => {
                                     item={editingItem}
                                     setItem={setEditingItem}
                                     onSave={handleUpdateItem}
+                                    categories={categories}
                                   />
                                 )}
                               </DialogContent>
@@ -539,5 +394,153 @@ const AdminArchive = () => {
     </AdminLayout>
   );
 };
+
+const CategoryForm = ({ category, setCategory, onSave, isNew }: {
+  category: ArchiveCategory | Omit<ArchiveCategory, 'id'>;
+  setCategory: (c: any) => void;
+  onSave: () => void;
+  isNew?: boolean;
+}) => (
+  <div className="space-y-4">
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Title</label>
+        <Input
+          value={category.title}
+          onChange={(e) => setCategory({ ...category, title: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Slug</label>
+        <Input
+          value={category.slug}
+          onChange={(e) => setCategory({ ...category, slug: e.target.value })}
+          placeholder="auto-generated-from-title"
+        />
+      </div>
+    </div>
+    <div>
+      <label className="text-sm font-medium mb-2 block">Description</label>
+      <Textarea
+        value={category.description || ''}
+        onChange={(e) => setCategory({ ...category, description: e.target.value })}
+        rows={3}
+      />
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Cover Image URL</label>
+        <Input
+          value={category.cover_image_url || ''}
+          onChange={(e) => setCategory({ ...category, cover_image_url: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Sort Order</label>
+        <Input
+          type="number"
+          value={category.sort_order}
+          onChange={(e) => setCategory({ ...category, sort_order: parseInt(e.target.value) })}
+        />
+      </div>
+    </div>
+    <div className="flex items-center gap-2">
+      <Switch
+        checked={category.is_visible}
+        onCheckedChange={(checked) => setCategory({ ...category, is_visible: checked })}
+      />
+      <span className="text-sm">Visible</span>
+    </div>
+    <Button onClick={onSave} className="w-full">
+      {isNew ? 'Create Category' : 'Update Category'}
+    </Button>
+  </div>
+);
+
+const ItemForm = ({ item, setItem, onSave, categories, isNew }: {
+  item: ArchiveItem | Omit<ArchiveItem, 'id'>;
+  setItem: (i: any) => void;
+  onSave: () => void;
+  categories: ArchiveCategory[];
+  isNew?: boolean;
+}) => (
+  <div className="space-y-4">
+    <div>
+      <label className="text-sm font-medium mb-2 block">Category</label>
+      <Select
+        value={item.category_id || ''}
+        onValueChange={(value) => setItem({ ...item, category_id: value || null })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Select category" />
+        </SelectTrigger>
+        <SelectContent>
+          {categories.map((cat) => (
+            <SelectItem key={cat.id} value={cat.id}>{cat.title}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+    <div>
+      <label className="text-sm font-medium mb-2 block">Title</label>
+      <Input
+        value={item.title}
+        onChange={(e) => setItem({ ...item, title: e.target.value })}
+      />
+    </div>
+    <div>
+      <label className="text-sm font-medium mb-2 block">Description</label>
+      <Textarea
+        value={item.description || ''}
+        onChange={(e) => setItem({ ...item, description: e.target.value })}
+        rows={3}
+      />
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Image URL</label>
+        <Input
+          value={item.image_url || ''}
+          onChange={(e) => setItem({ ...item, image_url: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Link URL</label>
+        <Input
+          value={item.link_url || ''}
+          onChange={(e) => setItem({ ...item, link_url: e.target.value })}
+        />
+      </div>
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Date</label>
+        <Input
+          value={item.date || ''}
+          onChange={(e) => setItem({ ...item, date: e.target.value })}
+          placeholder="2024"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Sort Order</label>
+        <Input
+          type="number"
+          value={item.sort_order}
+          onChange={(e) => setItem({ ...item, sort_order: parseInt(e.target.value) })}
+        />
+      </div>
+    </div>
+    <div className="flex items-center gap-2">
+      <Switch
+        checked={item.is_visible}
+        onCheckedChange={(checked) => setItem({ ...item, is_visible: checked })}
+      />
+      <span className="text-sm">Visible</span>
+    </div>
+    <Button onClick={onSave} className="w-full">
+      {isNew ? 'Create Item' : 'Update Item'}
+    </Button>
+  </div>
+);
 
 export default AdminArchive;

@@ -118,112 +118,6 @@ const AdminTour = () => {
     }
   };
 
-  const TourDateForm = ({ tourDate, setTourDate, onSave, isNew }: {
-    tourDate: TourDate | Omit<TourDate, 'id'>;
-    setTourDate: (d: any) => void;
-    onSave: () => void;
-    isNew?: boolean;
-  }) => (
-    <div className="space-y-4">
-      <div>
-        <label className="text-sm font-medium mb-2 block">Venue Name</label>
-        <Input
-          value={tourDate.venue_name}
-          onChange={(e) => setTourDate({ ...tourDate, venue_name: e.target.value })}
-        />
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">City</label>
-          <Input
-            value={tourDate.city}
-            onChange={(e) => setTourDate({ ...tourDate, city: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Country</label>
-          <Input
-            value={tourDate.country}
-            onChange={(e) => setTourDate({ ...tourDate, country: e.target.value })}
-          />
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Event Date</label>
-          <Input
-            type="date"
-            value={tourDate.event_date}
-            onChange={(e) => setTourDate({ ...tourDate, event_date: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Event Time</label>
-          <Input
-            type="time"
-            value={tourDate.event_time || ''}
-            onChange={(e) => setTourDate({ ...tourDate, event_time: e.target.value })}
-          />
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Ticket URL</label>
-          <Input
-            value={tourDate.ticket_url || ''}
-            onChange={(e) => setTourDate({ ...tourDate, ticket_url: e.target.value })}
-            placeholder="https://..."
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Ticket Price</label>
-          <Input
-            value={tourDate.ticket_price || ''}
-            onChange={(e) => setTourDate({ ...tourDate, ticket_price: e.target.value })}
-            placeholder="$25 - $50"
-          />
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Status</label>
-          <Select
-            value={tourDate.status}
-            onValueChange={(value) => setTourDate({ ...tourDate, status: value })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="available">Available</SelectItem>
-              <SelectItem value="sold_out">Sold Out</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-              <SelectItem value="postponed">Postponed</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center gap-2 pt-6">
-          <Switch
-            checked={tourDate.is_visible}
-            onCheckedChange={(checked) => setTourDate({ ...tourDate, is_visible: checked })}
-          />
-          <span className="text-sm">Visible</span>
-        </div>
-      </div>
-      <div>
-        <label className="text-sm font-medium mb-2 block">Additional Info</label>
-        <Textarea
-          value={tourDate.additional_info || ''}
-          onChange={(e) => setTourDate({ ...tourDate, additional_info: e.target.value })}
-          rows={2}
-        />
-      </div>
-      <Button onClick={onSave} className="w-full">
-        {isNew ? 'Add Tour Date' : 'Update Tour Date'}
-      </Button>
-    </div>
-  );
-
   if (loading) {
     return (
       <AdminLayout>
@@ -350,5 +244,111 @@ const AdminTour = () => {
     </AdminLayout>
   );
 };
+
+const TourDateForm = ({ tourDate, setTourDate, onSave, isNew }: {
+  tourDate: TourDate | Omit<TourDate, 'id'>;
+  setTourDate: (d: any) => void;
+  onSave: () => void;
+  isNew?: boolean;
+}) => (
+  <div className="space-y-4">
+    <div>
+      <label className="text-sm font-medium mb-2 block">Venue Name</label>
+      <Input
+        value={tourDate.venue_name}
+        onChange={(e) => setTourDate({ ...tourDate, venue_name: e.target.value })}
+      />
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">City</label>
+        <Input
+          value={tourDate.city}
+          onChange={(e) => setTourDate({ ...tourDate, city: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Country</label>
+        <Input
+          value={tourDate.country}
+          onChange={(e) => setTourDate({ ...tourDate, country: e.target.value })}
+        />
+      </div>
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Event Date</label>
+        <Input
+          type="date"
+          value={tourDate.event_date}
+          onChange={(e) => setTourDate({ ...tourDate, event_date: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Event Time</label>
+        <Input
+          type="time"
+          value={tourDate.event_time || ''}
+          onChange={(e) => setTourDate({ ...tourDate, event_time: e.target.value })}
+        />
+      </div>
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Ticket URL</label>
+        <Input
+          value={tourDate.ticket_url || ''}
+          onChange={(e) => setTourDate({ ...tourDate, ticket_url: e.target.value })}
+          placeholder="https://..."
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Ticket Price</label>
+        <Input
+          value={tourDate.ticket_price || ''}
+          onChange={(e) => setTourDate({ ...tourDate, ticket_price: e.target.value })}
+          placeholder="$25 - $50"
+        />
+      </div>
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Status</label>
+        <Select
+          value={tourDate.status}
+          onValueChange={(value) => setTourDate({ ...tourDate, status: value })}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="available">Available</SelectItem>
+            <SelectItem value="sold_out">Sold Out</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="postponed">Postponed</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex items-center gap-2 pt-6">
+        <Switch
+          checked={tourDate.is_visible}
+          onCheckedChange={(checked) => setTourDate({ ...tourDate, is_visible: checked })}
+        />
+        <span className="text-sm">Visible</span>
+      </div>
+    </div>
+    <div>
+      <label className="text-sm font-medium mb-2 block">Additional Info</label>
+      <Textarea
+        value={tourDate.additional_info || ''}
+        onChange={(e) => setTourDate({ ...tourDate, additional_info: e.target.value })}
+        rows={2}
+      />
+    </div>
+    <Button onClick={onSave} className="w-full">
+      {isNew ? 'Add Tour Date' : 'Update Tour Date'}
+    </Button>
+  </div>
+);
 
 export default AdminTour;

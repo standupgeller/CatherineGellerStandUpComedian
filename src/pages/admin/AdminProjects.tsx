@@ -106,92 +106,6 @@ const AdminProjects = () => {
     }
   };
 
-  const ProjectForm = ({ project, setProject, onSave, isNew }: {
-    project: Project | Omit<Project, 'id'>;
-    setProject: (p: any) => void;
-    onSave: () => void;
-    isNew?: boolean;
-  }) => (
-    <div className="space-y-4">
-      <div>
-        <label className="text-sm font-medium mb-2 block">Title</label>
-        <Input
-          value={project.title}
-          onChange={(e) => setProject({ ...project, title: e.target.value })}
-        />
-      </div>
-      <div>
-        <label className="text-sm font-medium mb-2 block">Description</label>
-        <Textarea
-          value={project.description || ''}
-          onChange={(e) => setProject({ ...project, description: e.target.value })}
-          rows={3}
-        />
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Image URL</label>
-          <Input
-            value={project.image_url || ''}
-            onChange={(e) => setProject({ ...project, image_url: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Category</label>
-          <Input
-            value={project.category || ''}
-            onChange={(e) => setProject({ ...project, category: e.target.value })}
-          />
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Link URL</label>
-          <Input
-            value={project.link_url || ''}
-            onChange={(e) => setProject({ ...project, link_url: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Link Text</label>
-          <Input
-            value={project.link_text}
-            onChange={(e) => setProject({ ...project, link_text: e.target.value })}
-          />
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Sort Order</label>
-          <Input
-            type="number"
-            value={project.sort_order}
-            onChange={(e) => setProject({ ...project, sort_order: parseInt(e.target.value) })}
-          />
-        </div>
-        <div className="flex items-center gap-6 pt-6">
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={project.is_featured}
-              onCheckedChange={(checked) => setProject({ ...project, is_featured: checked })}
-            />
-            <span className="text-sm">Featured</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={project.is_visible}
-              onCheckedChange={(checked) => setProject({ ...project, is_visible: checked })}
-            />
-            <span className="text-sm">Visible</span>
-          </div>
-        </div>
-      </div>
-      <Button onClick={onSave} className="w-full">
-        {isNew ? 'Create Project' : 'Update Project'}
-      </Button>
-    </div>
-  );
-
   if (loading) {
     return (
       <AdminLayout>
@@ -297,5 +211,91 @@ const AdminProjects = () => {
     </AdminLayout>
   );
 };
+
+const ProjectForm = ({ project, setProject, onSave, isNew }: {
+  project: Project | Omit<Project, 'id'>;
+  setProject: (p: any) => void;
+  onSave: () => void;
+  isNew?: boolean;
+}) => (
+  <div className="space-y-4">
+    <div>
+      <label className="text-sm font-medium mb-2 block">Title</label>
+      <Input
+        value={project.title}
+        onChange={(e) => setProject({ ...project, title: e.target.value })}
+      />
+    </div>
+    <div>
+      <label className="text-sm font-medium mb-2 block">Description</label>
+      <Textarea
+        value={project.description || ''}
+        onChange={(e) => setProject({ ...project, description: e.target.value })}
+        rows={3}
+      />
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Image URL</label>
+        <Input
+          value={project.image_url || ''}
+          onChange={(e) => setProject({ ...project, image_url: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Category</label>
+        <Input
+          value={project.category || ''}
+          onChange={(e) => setProject({ ...project, category: e.target.value })}
+        />
+      </div>
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Link URL</label>
+        <Input
+          value={project.link_url || ''}
+          onChange={(e) => setProject({ ...project, link_url: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Link Text</label>
+        <Input
+          value={project.link_text}
+          onChange={(e) => setProject({ ...project, link_text: e.target.value })}
+        />
+      </div>
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Sort Order</label>
+        <Input
+          type="number"
+          value={project.sort_order}
+          onChange={(e) => setProject({ ...project, sort_order: parseInt(e.target.value) })}
+        />
+      </div>
+      <div className="flex items-center gap-6 pt-6">
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={project.is_featured}
+            onCheckedChange={(checked) => setProject({ ...project, is_featured: checked })}
+          />
+          <span className="text-sm">Featured</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={project.is_visible}
+            onCheckedChange={(checked) => setProject({ ...project, is_visible: checked })}
+          />
+          <span className="text-sm">Visible</span>
+        </div>
+      </div>
+    </div>
+    <Button onClick={onSave} className="w-full">
+      {isNew ? 'Create Project' : 'Update Project'}
+    </Button>
+  </div>
+);
 
 export default AdminProjects;

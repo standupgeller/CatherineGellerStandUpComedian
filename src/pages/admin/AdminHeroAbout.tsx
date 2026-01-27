@@ -24,6 +24,7 @@ interface AboutSection {
   subtitle: string;
   content: string | null;
   image_url: string | null;
+  stats: { value: string; label: string }[] | null;
 }
 
 const AdminHeroAbout = () => {
@@ -44,8 +45,29 @@ const AdminHeroAbout = () => {
     ]);
 
     if (settingsRes.data) setSiteSettings(settingsRes.data);
-    if (aboutRes.data) setAboutSection(aboutRes.data);
+    if (aboutRes.data) {
+        // Default stats if missing
+        const stats = (aboutRes.data.stats as { value: string; label: string }[]) || [
+            { value: "10+", label: "Years" },
+            { value: "500+", label: "Shows" },
+            { value: "1M+", label: "Fans" }
+        ];
+        setAboutSection({ ...aboutRes.data, stats } as AboutSection);
+    }
     setLoading(false);
+  };
+
+  const handleStatChange = (index: number, field: 'value' | 'label', newValue: string) => {
+    if (!aboutSection) return;
+    const currentStats = aboutSection.stats ? [...aboutSection.stats] : [];
+    
+    // Ensure we have an object at this index
+    if (!currentStats[index]) {
+        currentStats[index] = { value: '', label: '' };
+    }
+    
+    currentStats[index] = { ...currentStats[index], [field]: newValue };
+    setAboutSection({ ...aboutSection, stats: currentStats });
   };
 
   const handleSave = async () => {
@@ -65,9 +87,15 @@ const AdminHeroAbout = () => {
     }
 
     if (aboutSection) {
+      // Cast stats back to Json for Supabase
+      const updateData = {
+          ...aboutSection,
+          stats: aboutSection.stats as unknown as any // Supabase expects Json
+      };
+
       const { error } = await supabase
         .from('about_section')
-        .update(aboutSection)
+        .update(updateData)
         .eq('id', aboutSection.id);
 
       if (error) {
@@ -203,6 +231,26 @@ const AdminHeroAbout = () => {
                 onChange={(e) => setAboutSection(prev => prev ? { ...prev, image_url: e.target.value } : null)}
                 placeholder="https://example.com/about-image.jpg"
               />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Stats</label>
+              <div className="grid gap-4">
+                {[0, 1, 2].map((index) => (
+                  <div key={index} className="grid grid-cols-2 gap-2">
+                    <Input
+                      placeholder="Value (e.g. 10+)"
+                      value={aboutSection?.stats?.[index]?.value || ''}
+                      onChange={(e) => handleStatChange(index, 'value', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Label (e.g. Years)"
+                      value={aboutSection?.stats?.[index]?.label || ''}
+                      onChange={(e) => handleStatChange(index, 'label', e.target.value)}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>

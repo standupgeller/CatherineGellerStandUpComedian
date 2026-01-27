@@ -122,95 +122,6 @@ const AdminVideos = () => {
     }
   };
 
-  const VideoForm = ({ video, setVideo, onSave, isNew }: {
-    video: Video | Omit<Video, 'id'>;
-    setVideo: (v: any) => void;
-    onSave: () => void;
-    isNew?: boolean;
-  }) => (
-    <div className="space-y-4">
-      <div>
-        <label className="text-sm font-medium mb-2 block">Title</label>
-        <Input
-          value={video.title}
-          onChange={(e) => setVideo({ ...video, title: e.target.value })}
-        />
-      </div>
-      <div>
-        <label className="text-sm font-medium mb-2 block">YouTube URL</label>
-        <Input
-          value={video.youtube_url || ''}
-          onChange={(e) => setVideo({ ...video, youtube_url: e.target.value })}
-          placeholder="https://youtube.com/watch?v=..."
-        />
-        <p className="text-xs text-muted-foreground mt-1">
-          Paste any YouTube URL - the embed ID will be extracted automatically
-        </p>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Thumbnail URL (optional)</label>
-          <Input
-            value={video.thumbnail_url || ''}
-            onChange={(e) => setVideo({ ...video, thumbnail_url: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Watermark URL</label>
-          <Input
-            value={video.watermark_url || ''}
-            onChange={(e) => setVideo({ ...video, watermark_url: e.target.value })}
-          />
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-3 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Duration</label>
-          <Input
-            value={video.duration || ''}
-            onChange={(e) => setVideo({ ...video, duration: e.target.value })}
-            placeholder="5:32"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Views</label>
-          <Input
-            value={video.views || ''}
-            onChange={(e) => setVideo({ ...video, views: e.target.value })}
-            placeholder="1.2M views"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium mb-2 block">Sort Order</label>
-          <Input
-            type="number"
-            value={video.sort_order}
-            onChange={(e) => setVideo({ ...video, sort_order: parseInt(e.target.value) })}
-          />
-        </div>
-      </div>
-      <div className="flex items-center gap-6">
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={video.is_featured}
-            onCheckedChange={(checked) => setVideo({ ...video, is_featured: checked })}
-          />
-          <span className="text-sm">Featured</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={video.is_visible}
-            onCheckedChange={(checked) => setVideo({ ...video, is_visible: checked })}
-          />
-          <span className="text-sm">Visible</span>
-        </div>
-      </div>
-      <Button onClick={onSave} className="w-full">
-        {isNew ? 'Add Video' : 'Update Video'}
-      </Button>
-    </div>
-  );
-
   if (loading) {
     return (
       <AdminLayout>
@@ -327,5 +238,94 @@ const AdminVideos = () => {
     </AdminLayout>
   );
 };
+
+const VideoForm = ({ video, setVideo, onSave, isNew }: {
+  video: Video | Omit<Video, 'id'>;
+  setVideo: (v: any) => void;
+  onSave: () => void;
+  isNew?: boolean;
+}) => (
+  <div className="space-y-4">
+    <div>
+      <label className="text-sm font-medium mb-2 block">Title</label>
+      <Input
+        value={video.title}
+        onChange={(e) => setVideo({ ...video, title: e.target.value })}
+      />
+    </div>
+    <div>
+      <label className="text-sm font-medium mb-2 block">YouTube URL</label>
+      <Input
+        value={video.youtube_url || ''}
+        onChange={(e) => setVideo({ ...video, youtube_url: e.target.value })}
+        placeholder="https://youtube.com/watch?v=..."
+      />
+      <p className="text-xs text-muted-foreground mt-1">
+        Paste any YouTube URL - the embed ID will be extracted automatically
+      </p>
+    </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Thumbnail URL (optional)</label>
+        <Input
+          value={video.thumbnail_url || ''}
+          onChange={(e) => setVideo({ ...video, thumbnail_url: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Watermark URL</label>
+        <Input
+          value={video.watermark_url || ''}
+          onChange={(e) => setVideo({ ...video, watermark_url: e.target.value })}
+        />
+      </div>
+    </div>
+    <div className="grid sm:grid-cols-3 gap-4">
+      <div>
+        <label className="text-sm font-medium mb-2 block">Duration</label>
+        <Input
+          value={video.duration || ''}
+          onChange={(e) => setVideo({ ...video, duration: e.target.value })}
+          placeholder="5:32"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Views</label>
+        <Input
+          value={video.views || ''}
+          onChange={(e) => setVideo({ ...video, views: e.target.value })}
+          placeholder="1.2M views"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-2 block">Sort Order</label>
+        <Input
+          type="number"
+          value={video.sort_order}
+          onChange={(e) => setVideo({ ...video, sort_order: parseInt(e.target.value) })}
+        />
+      </div>
+    </div>
+    <div className="flex items-center gap-6">
+      <div className="flex items-center gap-2">
+        <Switch
+          checked={video.is_featured}
+          onCheckedChange={(checked) => setVideo({ ...video, is_featured: checked })}
+        />
+        <span className="text-sm">Featured</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <Switch
+          checked={video.is_visible}
+          onCheckedChange={(checked) => setVideo({ ...video, is_visible: checked })}
+        />
+        <span className="text-sm">Visible</span>
+      </div>
+    </div>
+    <Button onClick={onSave} className="w-full">
+      {isNew ? 'Add Video' : 'Update Video'}
+    </Button>
+  </div>
+);
 
 export default AdminVideos;
