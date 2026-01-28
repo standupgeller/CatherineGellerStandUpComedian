@@ -12,6 +12,7 @@ import {
   Archive,
   Mail,
   Settings,
+  Scale,
   LogOut,
   Menu,
   X
@@ -31,6 +32,7 @@ const sidebarLinks = [
   { name: 'Tour Dates', href: '/admin/tour', icon: Calendar },
   { name: 'Archive', href: '/admin/archive', icon: Archive },
   { name: 'Contact & Footer', href: '/admin/contact', icon: Mail },
+  { name: 'Legal Pages', href: '/admin/legal', icon: Scale },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 

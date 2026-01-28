@@ -1,9 +1,19 @@
+import { useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLandingPage } from "@/context/LandingPageContext";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const HeroSection = () => {
   const { siteSettings } = useLandingPage();
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"]
+  });
+  
+  const imageY = useTransform(scrollYProgress, [0, 1], [0, 100]);
+  const textY = useTransform(scrollYProgress, [0, 1], [0, 50]);
 
   const scrollToAbout = () => {
     const element = document.querySelector("#about");
@@ -15,74 +25,101 @@ const HeroSection = () => {
   const heroTitle = siteSettings?.hero_title || "CATHERINE GELLER";
   const heroSubtitle = siteSettings?.hero_subtitle || "Making audiences laugh one punchline at a time. Raw, honest, and unapologetically hilarious.";
   const siteTagline = siteSettings?.site_tagline || "Stand-Up Comedian";
-  const backgroundGradient = siteSettings?.hero_background_gradient || "from-primary via-primary/90 to-burgundy-light";
+  const backgroundGradient = siteSettings?.hero_background_gradient || "from-secondary via-secondary to-secondary/30";
 
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      ref={ref}
+      className="relative min-h-screen flex items-center bg-secondary py-20 overflow-hidden"
     >
-      {/* Background placeholder */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${backgroundGradient}`}>
-        {/* Decorative elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-10 w-72 h-72 rounded-full bg-accent blur-3xl animate-float" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-rose blur-3xl animate-float" style={{ animationDelay: "1.5s" }} />
-        </div>
+      {/* Background Decorative elements removed to ensure clean background */}
+      
+      <div className="container mx-auto px-6 h-full relative z-10">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center h-full">
+          
+          {/* Left Column: Content */}
+          <motion.div 
+            style={{ y: textY }}
+            className="text-left order-2 lg:order-1"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
+            }}
+          >
+            <motion.h1 
+              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
+              className="font-display text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-tr from-[#1A2972] via-[#611991] to-[#3F00FF] bg-clip-text text-transparent mb-6"
+            >
+              {heroTitle}
+            </motion.h1>
+            <motion.p 
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
+              className="font-body text-sm md:text-base uppercase tracking-[0.3em] text-black mb-6"
+            >
+              {siteTagline}
+            </motion.p>
+            <motion.p 
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
+              className="font-body text-lg md:text-xl text-foreground/80 max-w-xl mb-10"
+            >
+              {heroSubtitle}
+            </motion.p>
+            
+            <motion.div 
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
+              <Button
+                variant="gradient"
+                size="lg"
+                className="font-body uppercase tracking-widest px-8 py-6 text-sm transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                onClick={() => document.querySelector("#tour")?.scrollIntoView({ behavior: "smooth" })}
+              >
+                See Tour Dates
+              </Button>
+              <Button
+                variant="gradient"
+                size="lg"
+                className="font-body uppercase tracking-widest px-8 py-6 text-sm transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                onClick={() => document.querySelector("#watch")?.scrollIntoView({ behavior: "smooth" })}
+              >
+                Watch Clips &gt;
+              </Button>
+            </motion.div>
+          </motion.div>
 
-        {/* Image placeholder overlay */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          {siteSettings?.hero_image_url ? (
-            <img 
-              src={siteSettings.hero_image_url} 
-              alt="Hero" 
-              className="w-full h-full object-cover opacity-50 mix-blend-overlay"
-            />
-          ) : (
-            <div className="text-primary-foreground/30 text-center">
-              <div className="w-64 h-64 md:w-96 md:h-96 border-2 border-dashed border-primary-foreground/20 rounded-full flex items-center justify-center">
-                <span className="font-body text-sm uppercase tracking-widest">Hero Image</span>
+          {/* Right Column: Image */}
+          <motion.div 
+            style={{ y: imageY }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="relative order-1 lg:order-2 w-full flex justify-center lg:justify-end"
+          >
+            {siteSettings?.hero_image_url ? (
+              <div className="w-full max-w-xl aspect-square rounded-[2.5rem] overflow-hidden shadow-2xl relative">
+                 <img 
+                  src={siteSettings.hero_image_url} 
+                  alt="Hero" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 text-center px-6">
-        <p className="font-body text-sm md:text-base uppercase tracking-[0.3em] text-accent mb-6 animate-fade-up">
-          {siteTagline}
-        </p>
-        <h1 className="font-display text-6xl md:text-8xl lg:text-9xl font-bold text-primary-foreground mb-6 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-          {heroTitle}
-        </h1>
-        <p className="font-body text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto mb-10 animate-fade-up" style={{ animationDelay: "0.4s" }}>
-          {heroSubtitle}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: "0.6s" }}>
-          <Button
-            variant="secondary"
-            size="lg"
-            className="font-body uppercase tracking-widest px-8 py-6 text-sm hover:bg-accent hover:text-accent-foreground transition-all"
-            onClick={() => document.querySelector("#tour")?.scrollIntoView({ behavior: "smooth" })}
-          >
-            See Tour Dates
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="font-body uppercase tracking-widest px-8 py-6 text-sm border-champagne/50 text-champagne bg-champagne/10 hover:bg-champagne/20 transition-all"
-            onClick={() => document.querySelector("#watch")?.scrollIntoView({ behavior: "smooth" })}
-          >
-            Watch Clips
-          </Button>
+            ) : (
+              <div className="w-full max-w-xl aspect-square rounded-[2.5rem] border-2 border-dashed border-primary/10 flex items-center justify-center bg-white/50">
+                <span className="font-body text-sm uppercase tracking-widest text-primary/40">Hero Image</span>
+              </div>
+            )}
+          </motion.div>
         </div>
       </div>
 
       {/* Scroll indicator */}
       <button
         onClick={scrollToAbout}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-primary-foreground/60 hover:text-accent transition-colors animate-bounce"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-primary/40 hover:text-primary transition-colors animate-bounce"
       >
         <ChevronDown className="w-8 h-8" />
       </button>

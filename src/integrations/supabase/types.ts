@@ -314,6 +314,8 @@ export type Database = {
           site_name: string
           site_tagline: string | null
           updated_at: string
+          privacy_policy: string | null
+          terms_of_service: string | null
         }
         Insert: {
           hero_background_gradient?: string | null
@@ -324,6 +326,8 @@ export type Database = {
           site_name?: string
           site_tagline?: string | null
           updated_at?: string
+          privacy_policy?: string | null
+          terms_of_service?: string | null
         }
         Update: {
           hero_background_gradient?: string | null
@@ -334,6 +338,8 @@ export type Database = {
           site_name?: string
           site_tagline?: string | null
           updated_at?: string
+          privacy_policy?: string | null
+          terms_of_service?: string | null
         }
         Relationships: []
       }

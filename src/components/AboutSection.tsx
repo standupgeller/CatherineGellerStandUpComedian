@@ -1,7 +1,18 @@
+import { useRef } from "react";
 import { useLandingPage } from "@/context/LandingPageContext";
+import AnimatedSection from "./AnimatedSection";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const AboutSection = () => {
   const { aboutSection } = useLandingPage();
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+
+  const imageY = useTransform(scrollYProgress, [0, 1], [50, -50]);
+  const decorativeY = useTransform(scrollYProgress, [0, 1], [20, -20]);
 
   const title = aboutSection?.title || "The Woman Behind the Mic";
   const subtitle = aboutSection?.subtitle || "About";
@@ -21,12 +32,12 @@ const AboutSection = () => {
   }
 
   return (
-    <section id="about" className="py-24 md:py-32 bg-background">
-      <div className="container mx-auto px-6">
+    <AnimatedSection id="about" className="py-24 md:py-32 bg-background">
+      <div ref={ref} className="container mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Image placeholder */}
           <div className="relative order-2 md:order-1">
-            <div className="aspect-[3/4] bg-muted rounded-lg overflow-hidden shadow-elevated">
+            <motion.div style={{ y: imageY }} className="aspect-[3/4] bg-muted rounded-lg overflow-hidden shadow-elevated relative z-10">
               {imageUrl ? (
                 <img 
                   src={imageUrl} 
@@ -40,9 +51,9 @@ const AboutSection = () => {
                   </span>
                 </div>
               )}
-            </div>
+            </motion.div>
             {/* Decorative frame */}
-            <div className="absolute -bottom-6 -right-6 w-full h-full border-2 border-accent rounded-lg -z-10" />
+            <motion.div style={{ y: decorativeY }} className="absolute -bottom-6 -right-6 w-full h-full border-2 border-accent rounded-lg z-0" />
           </div>
 
           {/* Content */}
@@ -50,7 +61,7 @@ const AboutSection = () => {
             <p className="font-body text-sm uppercase tracking-[0.3em] text-accent mb-4">
               {subtitle}
             </p>
-            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-primary mb-8">
+            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-tr from-[#1A2972] via-[#611991] to-[#3F00FF] bg-clip-text text-transparent mb-8">
               {title}
             </h2>
             <div className="space-y-6 font-body text-foreground/80 leading-relaxed">
@@ -82,7 +93,7 @@ const AboutSection = () => {
             <div className="grid grid-cols-3 gap-6 mt-12 pt-12 border-t border-border">
               {stats.map((stat, index) => (
                 <div key={index}>
-                  <p className="font-display text-4xl md:text-5xl font-bold text-primary">{stat.value}</p>
+                  <p className="font-display text-4xl md:text-5xl font-bold bg-gradient-to-tr from-[#1A2972] via-[#611991] to-[#3F00FF] bg-clip-text text-transparent">{stat.value}</p>
                   <p className="font-body text-sm uppercase tracking-widest text-muted-foreground mt-2">{stat.label}</p>
                 </div>
               ))}
@@ -90,7 +101,7 @@ const AboutSection = () => {
           </div>
         </div>
       </div>
-    </section>
+    </AnimatedSection>
   );
 };
 

@@ -2,13 +2,16 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLandingPage } from "@/context/LandingPageContext";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { navLinks, siteSettings } = useLandingPage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
   
-  const siteName = siteSettings?.site_name || "CATHERINE GELLER";
+  const siteName = siteSettings?.site_name || "Catherine Geller";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,9 +25,21 @@ const Navbar = () => {
   }, []);
 
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    // If we're not on the home page and the link is a hash link, navigate to home first
+    if (location.pathname !== "/" && href.startsWith("#")) {
+      navigate("/");
+      // Wait for navigation then scroll
+      setTimeout(() => {
+        const element = document.querySelector(href);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    } else {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
     }
     setIsMobileMenuOpen(false);
   };
@@ -54,7 +69,7 @@ const Navbar = () => {
         <button
           onClick={() => scrollToSection("#hero")}
           className={`font-display text-2xl md:text-3xl font-semibold tracking-wide transition-colors ${
-            isScrolled ? "text-primary hover:text-accent" : "text-champagne hover:text-accent"
+            isScrolled ? "text-black hover:text-primary" : "text-black hover:text-primary"
           }`}
         >
           {siteName}
@@ -66,8 +81,8 @@ const Navbar = () => {
             <button
               key={link.id}
               onClick={() => scrollToSection(link.href)}
-              className={`font-body text-sm uppercase tracking-widest nav-link-underline transition-colors ${
-                isScrolled ? "text-foreground/80 hover:text-accent" : "text-champagne/90 hover:text-accent"
+              className={`font-body text-sm uppercase tracking-widest transition-all px-3 py-1 rounded-md transform hover:scale-105 ${
+                isScrolled ? "text-black hover:text-white hover:bg-gradient-to-tr hover:from-[#1A2972] hover:via-[#611991] hover:to-[#3F00FF]" : "text-black hover:text-white hover:bg-gradient-to-tr hover:from-[#1A2972] hover:via-[#611991] hover:to-[#3F00FF]"
               }`}
             >
               {link.name}
