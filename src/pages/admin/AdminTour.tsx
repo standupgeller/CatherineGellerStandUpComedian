@@ -165,10 +165,10 @@ const AdminTour = () => {
                   <div className="flex items-start gap-4">
                     <div className="text-center min-w-[60px]">
                       <div className="text-2xl font-bold">
-                        {new Date(tourDate.event_date).getDate()}
+                        {new Date(tourDate.event_date + 'T12:00:00').getDate()}
                       </div>
                       <div className="text-xs text-muted-foreground uppercase">
-                        {new Date(tourDate.event_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                        {new Date(tourDate.event_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                       </div>
                     </div>
                     <div>
