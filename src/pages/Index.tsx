@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import AboutSection from "@/components/AboutSection";
 import ProjectsSection from "@/components/ProjectsSection";
 import WatchSection from "@/components/WatchSection";
 import TourSection from "@/components/TourSection";
@@ -24,7 +23,6 @@ const LandingPageContent = () => {
     <div className="min-h-screen animate-fade-in">
       <Navbar />
       <HeroSection />
-      <AboutSection />
       {siteSettings?.show_projects_section !== false && <ProjectsSection />}
       {siteSettings?.show_videos_section !== false && <WatchSection />}
       <TourSection />

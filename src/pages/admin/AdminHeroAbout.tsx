@@ -15,7 +15,7 @@ interface SiteSettings {
   site_tagline: string;
   hero_title: string;
   hero_subtitle: string;
-  hero_image_url: string | null;
+  hero_background_image_url: string | null;
   hero_background_gradient: string;
 }
 
@@ -175,11 +175,11 @@ const AdminHeroAbout = () => {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium mb-2 block">Hero Image URL</label>
+                <label className="text-sm font-medium mb-2 block">Hero Background Image URL (PNG)</label>
                 <Input
-                  value={siteSettings?.hero_image_url || ''}
-                  onChange={(e) => setSiteSettings(prev => prev ? { ...prev, hero_image_url: e.target.value } : null)}
-                  placeholder="https://example.com/image.jpg"
+                  value={siteSettings?.hero_background_image_url || ''}
+                  onChange={(e) => setSiteSettings(prev => prev ? { ...prev, hero_background_image_url: e.target.value } : null)}
+                  placeholder="https://example.com/hero-bg.png"
                 />
               </div>
               <div>

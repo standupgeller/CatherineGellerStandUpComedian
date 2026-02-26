@@ -5,14 +5,13 @@ import { useLandingPage } from "@/context/LandingPageContext";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const HeroSection = () => {
-  const { siteSettings } = useLandingPage();
+  const { siteSettings, aboutSection } = useLandingPage();
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"]
   });
   
-  const imageY = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const textY = useTransform(scrollYProgress, [0, 1], [0, 50]);
 
   const scrollToAbout = () => {
@@ -25,22 +24,46 @@ const HeroSection = () => {
   const heroTitle = siteSettings?.hero_title || "CATHERINE GELLER";
   const siteTagline = siteSettings?.site_tagline || "Stand-Up Comedian";
   const backgroundGradient = siteSettings?.hero_background_gradient || "from-secondary via-secondary to-secondary/30";
+  const heroBgImage = siteSettings?.hero_background_image_url || "";
+  const splitTitle = heroTitle.trim().split(/\s+/);
+  const firstLine = splitTitle.length > 1 ? splitTitle.slice(0, -1).join(" ") : heroTitle;
+  const lastWord = splitTitle.length > 1 ? splitTitle[splitTitle.length - 1] : "";
+  const rawContent = aboutSection?.content?.trim() ?? "";
+  let paragraphs: string[] = [];
+  if (rawContent) {
+    const byLines = rawContent.split("\n").map(p => p.trim()).filter(p => p.length > 0);
+    if (byLines.length > 1) {
+      paragraphs = byLines;
+    } else if (rawContent.includes("With sharp logic")) {
+      const idx = rawContent.indexOf("With sharp logic");
+      const before = rawContent.slice(0, idx).trim();
+      const after = rawContent.slice(idx).trim();
+      if (before) paragraphs.push(before);
+      if (after) paragraphs.push(after);
+    } else {
+      paragraphs = [rawContent];
+    }
+  }
 
   return (
     <section
       id="hero"
       ref={ref}
-      className="relative min-h-screen flex items-center bg-secondary py-20 overflow-hidden"
+      className={`relative min-h-screen flex items-center py-20 overflow-hidden ${heroBgImage ? "bg-cover bg-no-repeat bg-[80%_center]" : ""}`}
+      style={{
+        backgroundImage: heroBgImage ? `url(${heroBgImage})` : undefined,
+        backgroundColor: heroBgImage ? undefined : undefined
+      }}
     >
       {/* Background Decorative elements removed to ensure clean background */}
       
       <div className="container mx-auto px-6 h-full relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center h-full">
+        <div className="grid lg:grid-cols-1 gap-8 items-start h-full">
           
           {/* Left Column: Content */}
           <motion.div 
             style={{ y: textY }}
-            className="text-left order-2 lg:order-1"
+            className="text-left -mt-10 md:-mt-14 lg:-mt-16"
             initial="hidden"
             animate="visible"
             variants={{
@@ -50,25 +73,26 @@ const HeroSection = () => {
           >
             <motion.h1 
               variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
-              className="font-display text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-tr from-[#1A2972] via-[#611991] to-[#3F00FF] bg-clip-text text-transparent mb-6"
+              className="font-display text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-4"
             >
-              {heroTitle}
+              <span>{firstLine}</span>
+              {lastWord && (
+                <>
+                  <br />
+                  <span>{lastWord}</span>
+                </>
+              )}
             </motion.h1>
             <motion.p 
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
-              className="font-body text-sm md:text-base uppercase tracking-[0.3em] text-black mb-6"
+              className="font-body text-sm md:text-base uppercase tracking-[0.3em] text-white mb-4"
             >
               {siteTagline}
-            </motion.p>
-            <motion.p 
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
-              className="font-body text-lg md:text-xl text-foreground/80 max-w-xl mb-10"
-            >
             </motion.p>
             
             <motion.div 
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
-              className="flex flex-col sm:flex-row gap-4"
+              className="flex flex-col sm:flex-row gap-4 mb-12"
             >
               <Button
                 variant="gradient"
@@ -82,35 +106,25 @@ const HeroSection = () => {
                 variant="gradient"
                 size="lg"
                 className="font-body uppercase tracking-widest px-8 py-6 text-sm transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
-                onClick={() => document.querySelector("#watch")?.scrollIntoView({ behavior: "smooth" })}
+                onClick={() => document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" })}
               >
-                Watch Clips &gt;
+                Book Now
               </Button>
             </motion.div>
+            <div id="about" className="space-y-3 sm:space-y-4 font-body leading-normal mt-16 sm:mt-20 text-justify w-full sm:w-[90%] md:w-[80%] lg:w-[70%]">
+              <p className="font-body text-sm uppercase tracking-[0.3em] text-white">About</p>
+              {paragraphs.length > 0 && (
+                <div className="space-y-3 sm:space-y-4">
+                  {paragraphs.map((paragraph, i) => (
+                    <p key={i} className="text-white">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
           </motion.div>
 
-          {/* Right Column: Image */}
-          <motion.div 
-            style={{ y: imageY }}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="relative order-1 lg:order-2 w-full flex justify-center lg:justify-end"
-          >
-            {siteSettings?.hero_image_url ? (
-              <div className="w-full max-w-xl aspect-square rounded-[2.5rem] overflow-hidden shadow-2xl relative">
-                 <img 
-                  src={siteSettings.hero_image_url} 
-                  alt="Hero" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="w-full max-w-xl aspect-square rounded-[2.5rem] border-2 border-dashed border-primary/10 flex items-center justify-center bg-white/50">
-                <span className="font-body text-sm uppercase tracking-widest text-primary/40">Hero Image</span>
-              </div>
-            )}
-          </motion.div>
         </div>
       </div>
 

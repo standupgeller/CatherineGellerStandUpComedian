@@ -307,6 +307,7 @@ export type Database = {
       site_settings: {
         Row: {
           hero_background_gradient: string | null
+          hero_background_image_url: string | null
           hero_image_url: string | null
           hero_subtitle: string | null
           hero_title: string | null
@@ -322,6 +323,7 @@ export type Database = {
         }
         Insert: {
           hero_background_gradient?: string | null
+          hero_background_image_url?: string | null
           hero_image_url?: string | null
           hero_subtitle?: string | null
           hero_title?: string | null
@@ -337,6 +339,7 @@ export type Database = {
         }
         Update: {
           hero_background_gradient?: string | null
+          hero_background_image_url?: string | null
           hero_image_url?: string | null
           hero_subtitle?: string | null
           hero_title?: string | null
