@@ -64,30 +64,13 @@ const AboutSection = () => {
             <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-tr from-[#1A2972] via-[#611991] to-[#3F00FF] bg-clip-text text-transparent mb-8">
               {title}
             </h2>
-            <div className="space-y-6 font-body text-foreground/80 leading-relaxed">
-              {content ? (
-                content.split('\n').map((paragraph, index) => (
+            {content && content.trim().length > 0 && (
+              <div className="space-y-6 font-body text-foreground/80 leading-relaxed">
+                {content.split('\n').map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
-                ))
-              ) : (
-                <>
-                  <p>
-                    Catherine Geller has been making audiences roar with laughter for over a decade.
-                    Known for her sharp wit, relatable storytelling, and fearless approach to
-                    comedy, she's become one of the most sought-after performers in the industry.
-                  </p>
-                  <p>
-                    From sold-out theater tours to Netflix specials, Catherine brings her unique
-                    perspective on life, relationships, and the absurdity of everyday existence
-                    to stages around the world.
-                  </p>
-                  <p>
-                    When she's not on stage, you can find her writing new material, hosting
-                    her hit podcast, or spending time with her rescue dogs.
-                  </p>
-                </>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 mt-12 pt-12 border-t border-border">
