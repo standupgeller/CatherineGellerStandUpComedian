@@ -316,6 +316,9 @@ export type Database = {
           updated_at: string
           privacy_policy: string | null
           terms_of_service: string | null
+          show_projects_section: boolean
+          show_archive_section: boolean
+          show_videos_section: boolean
         }
         Insert: {
           hero_background_gradient?: string | null
@@ -326,6 +329,9 @@ export type Database = {
           site_name?: string
           site_tagline?: string | null
           updated_at?: string
+          show_projects_section?: boolean
+          show_archive_section?: boolean
+          show_videos_section?: boolean
           privacy_policy?: string | null
           terms_of_service?: string | null
         }
@@ -338,6 +344,9 @@ export type Database = {
           site_name?: string
           site_tagline?: string | null
           updated_at?: string
+          show_projects_section?: boolean
+          show_archive_section?: boolean
+          show_videos_section?: boolean
           privacy_policy?: string | null
           terms_of_service?: string | null
         }

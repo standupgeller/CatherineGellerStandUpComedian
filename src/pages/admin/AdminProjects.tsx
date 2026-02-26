@@ -42,9 +42,12 @@ const AdminProjects = () => {
   const [newProject, setNewProject] = useState(emptyProject);
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+  const [showProjectsSection, setShowProjectsSection] = useState<boolean>(true);
 
   useEffect(() => {
     fetchProjects();
+    fetchSectionVisibility();
   }, []);
 
   const fetchProjects = async () => {
@@ -59,6 +62,43 @@ const AdminProjects = () => {
       setProjects(data || []);
     }
     setLoading(false);
+  };
+
+  const fetchSectionVisibility = async () => {
+    const { data, error } = await supabase.from('site_settings').select('*').maybeSingle();
+    if (error) {
+      toast({ title: 'Error loading section visibility', variant: 'destructive' });
+      return;
+    }
+    if (data) {
+      setSettingsId(data.id);
+      setShowProjectsSection(data.show_projects_section ?? true);
+    } else {
+      const { data: newRow, error: insertError } = await supabase.from('site_settings').insert({}).select().single();
+      if (insertError) {
+        toast({ title: 'Error initializing site settings', variant: 'destructive' });
+      } else if (newRow) {
+        setSettingsId(newRow.id);
+        setShowProjectsSection(newRow.show_projects_section ?? true);
+      }
+    }
+  };
+
+  const handleToggleSection = async (checked: boolean) => {
+    if (!settingsId) {
+      toast({ title: 'Settings not initialized', variant: 'destructive' });
+      return;
+    }
+    setShowProjectsSection(checked);
+    const { error } = await supabase
+      .from('site_settings')
+      .update({ show_projects_section: checked })
+      .eq('id', settingsId);
+    if (error) {
+      toast({ title: 'Error updating visibility', variant: 'destructive' });
+    } else {
+      toast({ title: `Projects section ${checked ? 'shown' : 'hidden'}` });
+    }
   };
 
   const handleCreate = async () => {
@@ -124,25 +164,31 @@ const AdminProjects = () => {
             <h1 className="font-display text-3xl font-bold">Projects</h1>
             <p className="text-muted-foreground mt-1">Manage your projects</p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Project
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>New Project</DialogTitle>
-              </DialogHeader>
-              <ProjectForm
-                project={newProject}
-                setProject={(p) => setNewProject(p as Omit<Project, 'id'>)}
-                onSave={handleCreate}
-                isNew
-              />
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Switch checked={showProjectsSection} onCheckedChange={handleToggleSection} />
+              <span className="text-sm">Show section on website</span>
+            </div>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>New Project</DialogTitle>
+                </DialogHeader>
+                <ProjectForm
+                  project={newProject}
+                  setProject={(p) => setNewProject(p as Omit<Project, 'id'>)}
+                  onSave={handleCreate}
+                  isNew
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         <div className="grid gap-4">

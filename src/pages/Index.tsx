@@ -10,7 +10,7 @@ import Footer from "@/components/Footer";
 import { LandingPageProvider, useLandingPage } from "@/context/LandingPageContext";
 
 const LandingPageContent = () => {
-  const { loading } = useLandingPage();
+  const { loading, siteSettings } = useLandingPage();
 
   if (loading) {
     return (
@@ -25,10 +25,10 @@ const LandingPageContent = () => {
       <Navbar />
       <HeroSection />
       <AboutSection />
-      <ProjectsSection />
-      <WatchSection />
+      {siteSettings?.show_projects_section !== false && <ProjectsSection />}
+      {siteSettings?.show_videos_section !== false && <WatchSection />}
       <TourSection />
-      <ArchiveSection />
+      {siteSettings?.show_archive_section !== false && <ArchiveSection />}
       <ContactSection />
       <Footer />
     </div>

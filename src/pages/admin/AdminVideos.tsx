@@ -48,9 +48,12 @@ const AdminVideos = () => {
   const [newVideo, setNewVideo] = useState(emptyVideo);
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+  const [showVideosSection, setShowVideosSection] = useState<boolean>(true);
 
   useEffect(() => {
     fetchVideos();
+    fetchSectionVisibility();
   }, []);
 
   const fetchVideos = async () => {
@@ -65,6 +68,43 @@ const AdminVideos = () => {
       setVideos(data || []);
     }
     setLoading(false);
+  };
+
+  const fetchSectionVisibility = async () => {
+    const { data, error } = await supabase.from('site_settings').select('*').maybeSingle();
+    if (error) {
+      toast({ title: 'Error loading section visibility', variant: 'destructive' });
+      return;
+    }
+    if (data) {
+      setSettingsId(data.id);
+      setShowVideosSection(data.show_videos_section ?? true);
+    } else {
+      const { data: newRow, error: insertError } = await supabase.from('site_settings').insert({}).select().single();
+      if (insertError) {
+        toast({ title: 'Error initializing site settings', variant: 'destructive' });
+      } else if (newRow) {
+        setSettingsId(newRow.id);
+        setShowVideosSection(newRow.show_videos_section ?? true);
+      }
+    }
+  };
+
+  const handleToggleSection = async (checked: boolean) => {
+    if (!settingsId) {
+      toast({ title: 'Settings not initialized', variant: 'destructive' });
+      return;
+    }
+    setShowVideosSection(checked);
+    const { error } = await supabase
+      .from('site_settings')
+      .update({ show_videos_section: checked })
+      .eq('id', settingsId);
+    if (error) {
+      toast({ title: 'Error updating visibility', variant: 'destructive' });
+    } else {
+      toast({ title: `Videos section ${checked ? 'shown' : 'hidden'}` });
+    }
   };
 
   const handleCreate = async () => {
@@ -140,25 +180,31 @@ const AdminVideos = () => {
             <h1 className="font-display text-3xl font-bold">Videos</h1>
             <p className="text-muted-foreground mt-1">Manage YouTube videos</p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Video
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>New Video</DialogTitle>
-              </DialogHeader>
-              <VideoForm
-                video={newVideo}
-                setVideo={(v) => setNewVideo(v as Omit<Video, 'id'>)}
-                onSave={handleCreate}
-                isNew
-              />
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Switch checked={showVideosSection} onCheckedChange={handleToggleSection} />
+              <span className="text-sm">Show section on website</span>
+            </div>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Video
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>New Video</DialogTitle>
+                </DialogHeader>
+                <VideoForm
+                  video={newVideo}
+                  setVideo={(v) => setNewVideo(v as Omit<Video, 'id'>)}
+                  onSave={handleCreate}
+                  isNew
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -41,9 +41,12 @@ const AdminArchive = () => {
   const [newCategory, setNewCategory] = useState(emptyCategory);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const { toast } = useToast();
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+  const [showArchiveSection, setShowArchiveSection] = useState<boolean>(true);
 
   useEffect(() => {
     fetchData();
+    fetchSectionVisibility();
   }, []);
 
   const fetchData = async () => {
@@ -54,6 +57,43 @@ const AdminArchive = () => {
       setCategories(data || []);
     }
     setLoading(false);
+  };
+
+  const fetchSectionVisibility = async () => {
+    const { data, error } = await supabase.from('site_settings').select('*').maybeSingle();
+    if (error) {
+      toast({ title: 'Error loading section visibility', variant: 'destructive' });
+      return;
+    }
+    if (data) {
+      setSettingsId(data.id);
+      setShowArchiveSection(data.show_archive_section ?? true);
+    } else {
+      const { data: newRow, error: insertError } = await supabase.from('site_settings').insert({}).select().single();
+      if (insertError) {
+        toast({ title: 'Error initializing site settings', variant: 'destructive' });
+      } else if (newRow) {
+        setSettingsId(newRow.id);
+        setShowArchiveSection(newRow.show_archive_section ?? true);
+      }
+    }
+  };
+
+  const handleToggleSection = async (checked: boolean) => {
+    if (!settingsId) {
+      toast({ title: 'Settings not initialized', variant: 'destructive' });
+      return;
+    }
+    setShowArchiveSection(checked);
+    const { error } = await supabase
+      .from('site_settings')
+      .update({ show_archive_section: checked })
+      .eq('id', settingsId);
+    if (error) {
+      toast({ title: 'Error updating visibility', variant: 'destructive' });
+    } else {
+      toast({ title: `Archive section ${checked ? 'shown' : 'hidden'}` });
+    }
   };
 
   const generateSlug = (title: string) => {
@@ -136,7 +176,11 @@ const AdminArchive = () => {
           </TabsList>
 
           <TabsContent value="categories" className="space-y-4 mt-6">
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Switch checked={showArchiveSection} onCheckedChange={handleToggleSection} />
+                <span className="text-sm">Show section on website</span>
+              </div>
               <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
                 <DialogTrigger asChild>
                   <Button>

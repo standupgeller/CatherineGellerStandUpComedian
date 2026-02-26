@@ -23,7 +23,6 @@ const HeroSection = () => {
   };
 
   const heroTitle = siteSettings?.hero_title || "CATHERINE GELLER";
-  const heroSubtitle = siteSettings?.hero_subtitle || "Making audiences laugh one punchline at a time. Raw, honest, and unapologetically hilarious.";
   const siteTagline = siteSettings?.site_tagline || "Stand-Up Comedian";
   const backgroundGradient = siteSettings?.hero_background_gradient || "from-secondary via-secondary to-secondary/30";
 
@@ -65,7 +64,6 @@ const HeroSection = () => {
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
               className="font-body text-lg md:text-xl text-foreground/80 max-w-xl mb-10"
             >
-              {heroSubtitle}
             </motion.p>
             
             <motion.div 
