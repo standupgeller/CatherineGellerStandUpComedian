@@ -13,6 +13,7 @@ const HeroSection = () => {
   });
   
   const textY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
 
   const scrollToAbout = () => {
     const element = document.querySelector("#about");
@@ -49,12 +50,19 @@ const HeroSection = () => {
     <section
       id="hero"
       ref={ref}
-      className={`relative min-h-screen flex items-center py-20 overflow-hidden ${heroBgImage ? "bg-cover bg-no-repeat bg-[80%_center]" : ""}`}
-      style={{
-        backgroundImage: heroBgImage ? `url(${heroBgImage})` : undefined,
-        backgroundColor: heroBgImage ? undefined : undefined
-      }}
+      className="relative min-h-screen flex items-center py-20 overflow-hidden"
     >
+      {/* Background with Parallax */}
+      {heroBgImage && (
+        <motion.div
+          className="absolute -top-[15%] left-0 w-full h-[130%] bg-cover bg-no-repeat bg-[80%_center] z-0"
+          style={{
+            backgroundImage: `url(${heroBgImage})`,
+            y: bgY
+          }}
+        />
+      )}
+      
       {/* Background Decorative elements removed to ensure clean background */}
       
       <div className="container mx-auto px-6 h-full relative z-10">
