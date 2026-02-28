@@ -64,56 +64,43 @@ const Navbar = () => {
           : "bg-transparent py-6"
       }`}
     >
-      <div className="container mx-auto px-6 flex items-center justify-between">
+      <div className="container mx-auto px-6 flex items-center">
         {/* Logo */}
-        {isScrolled ? (
+        {isScrolled && (
           <button
             onClick={() => scrollToSection("#hero")}
             className="font-display text-2xl md:text-3xl font-semibold tracking-wide text-black hover:text-primary transition-colors"
           >
             {siteName}
           </button>
-        ) : (
-          <button
-            onClick={() => scrollToSection("#hero")}
-            className="rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40"
-          >
-            <img
-              src="/letter-g.png"
-              alt="Logo"
-              className="h-10 w-10 md:h-12 md:w-12 object-contain"
-            />
-          </button>
         )}
-
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-8">
-          {displayLinks.map((link) => (
-            <button
-              key={link.id}
-              onClick={() => scrollToSection(link.href)}
-              className={`font-body text-sm uppercase tracking-widest transition-all px-3 py-1 rounded-md transform hover:scale-105 ${
-                isScrolled ? "text-black hover:text-white hover:bg-gradient-to-tr hover:from-[#1A2972] hover:via-[#611991] hover:to-[#3F00FF]" : "text-white hover:text-white hover:bg-gradient-to-tr hover:from-[#1A2972] hover:via-[#611991] hover:to-[#3F00FF]"
-              }`}
-            >
-              {link.name}
-            </button>
-          ))}
+        <div className="ml-auto flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-8">
+            {displayLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => scrollToSection(link.href)}
+                className={`font-body text-sm uppercase tracking-widest transition-all px-3 py-1 rounded-md transform hover:scale-105 ${
+                  isScrolled ? "text-black hover:text-white hover:bg-gradient-to-tr hover:from-[#1A2972] hover:via-[#611991] hover:to-[#3F00FF]" : "text-white hover:text-white hover:bg-gradient-to-tr hover:from-[#1A2972] hover:via-[#611991] hover:to-[#3F00FF]"
+                }`}
+              >
+                {link.name}
+              </button>
+            ))}
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? (
+              <X className={`h-6 w-6 ${isScrolled ? "text-black" : "text-white"}`} />
+            ) : (
+              <Menu className={`h-6 w-6 ${isScrolled ? "text-black" : "text-white"}`} />
+            )}
+          </Button>
         </div>
-
-        {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? (
-            <X className={`h-6 w-6 ${isScrolled ? "text-black" : "text-white"}`} />
-          ) : (
-            <Menu className={`h-6 w-6 ${isScrolled ? "text-black" : "text-white"}`} />
-          )}
-        </Button>
       </div>
 
       {/* Mobile Menu */}

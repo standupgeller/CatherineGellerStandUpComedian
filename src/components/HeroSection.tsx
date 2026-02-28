@@ -71,7 +71,7 @@ const HeroSection = () => {
           {/* Left Column: Content */}
           <motion.div 
             style={{ y: textY }}
-            className="text-left -mt-10 md:-mt-14 lg:-mt-16"
+            className="text-left mt-20 md:mt-24 lg:mt-28"
             initial="hidden"
             animate="visible"
             variants={{
@@ -81,7 +81,7 @@ const HeroSection = () => {
           >
             <motion.h1 
               variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
-              className="font-display text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-4"
+              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white mb-4"
             >
               <span>{firstLine}</span>
               {lastWord && (
@@ -93,7 +93,7 @@ const HeroSection = () => {
             </motion.h1>
             <motion.p 
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
-              className="font-body text-sm md:text-base uppercase tracking-[0.3em] text-white mb-4"
+              className="font-body text-xs sm:text-sm md:text-base uppercase tracking-[0.3em] text-white mb-4"
             >
               {siteTagline}
             </motion.p>
@@ -105,7 +105,7 @@ const HeroSection = () => {
               <Button
                 variant="gradient"
                 size="lg"
-                className="font-body uppercase tracking-widest px-8 py-6 text-sm transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                className="font-body uppercase tracking-widest px-6 py-4 sm:px-8 sm:py-6 text-xs sm:text-sm transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
                 onClick={() => document.querySelector("#tour")?.scrollIntoView({ behavior: "smooth" })}
               >
                 See Tour Dates
@@ -113,18 +113,17 @@ const HeroSection = () => {
               <Button
                 variant="gradient"
                 size="lg"
-                className="font-body uppercase tracking-widest px-8 py-6 text-sm transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                className="font-body uppercase tracking-widest px-6 py-4 sm:px-8 sm:py-6 text-xs sm:text-sm transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
                 onClick={() => document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" })}
               >
                 Book Now
               </Button>
             </motion.div>
-            <div id="about" className="space-y-3 sm:space-y-4 font-body leading-normal mt-16 sm:mt-20 text-justify w-full sm:w-[90%] md:w-[80%] lg:w-[70%]">
-              <p className="font-body text-sm uppercase tracking-[0.3em] text-white">About</p>
+            <div id="about" className="space-y-3 sm:space-y-4 font-body leading-normal mt-16 sm:mt-20 text-justify w-full sm:w-[95%] md:w-[90%] lg:w-full lg:max-w-[40vw]">
               {paragraphs.length > 0 && (
                 <div className="space-y-3 sm:space-y-4">
                   {paragraphs.map((paragraph, i) => (
-                    <p key={i} className="text-white">
+                    <p key={i} className="text-white text-sm sm:text-base md:text-lg lg:text-xl">
                       {paragraph}
                     </p>
                   ))}
